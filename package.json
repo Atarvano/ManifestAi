@@ -12,6 +12,7 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "@fortawesome/fontawesome-free": "^7.1.0",
     "archiver": "^7.0.1",
     "axios": "^1.13.2",
     "dotenv": "^17.2.3",
@@ -19,6 +20,7 @@
     "express": "^5.1.0",
     "multer": "^2.0.2",
     "puppeteer": "^24.30.0",
+    "tailwindcss": "^4.1.17",
     "undici": "^7.16.0",
     "xlsx": "^0.18.5"
   }
