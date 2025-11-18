@@ -360,50 +360,81 @@ function downloadJSON() {
 }
 
 /**
- * Download data as Excel
+ * Download styled Excel with PT. Alam Raya Indonesia format
  */
-function downloadExcel() {
+async function downloadExcel() {
   if (!manifestData || !manifestData.data) {
     alert("❌ Tidak ada data untuk didownload");
     return;
   }
 
-  // Convert to CSV format
-  const headers = [
-    "item_no",
-    "description",
-    "hs_code",
-    "quantity",
-    "unit",
-    "unit_price",
-    "total_price",
-    "weight",
-    "volume",
-    "country_of_origin",
-    "bl_number",
-  ];
+  try {
+    // Show loading
+    const button = document.querySelector('button[onclick="downloadExcel()"]');
+    const originalText = button.innerHTML;
+    button.innerHTML =
+      '<i class="fas fa-spinner fa-spin mr-2"></i>Generating Excel...';
+    button.disabled = true;
 
-  let csv = headers.join(",") + "\n";
+    // Prepare data for ZIP endpoint
+    const requestData = {
+      manifestData: {
+        groupedData: groupedData, // Use global groupedData variable
+        metadata: {
+          filename: manifestData.metadata?.filename || "manifest.xlsx",
+          modelUsed: manifestData.metadata?.modelUsed || "gemini",
+          shipName: manifestData.metadata?.shipName || "",
+          masterName: manifestData.metadata?.masterName || "",
+          sailedDate: new Date().toLocaleDateString("id-ID"),
+          cargoFrom: manifestData.metadata?.cargoFrom || "",
+          cargoTo: manifestData.metadata?.cargoTo || "",
+          nationality: "Indonesia",
+        },
+      },
+      includePDFs: false, // Only generate Excel files
+    };
 
-  manifestData.data.forEach((item) => {
-    const row = headers.map((header) => {
-      const value = item[header] || "";
-      // Escape commas and quotes in CSV
-      return `"${String(value).replace(/"/g, '""')}"`;
+    const response = await fetch("/api/generate-excel", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(requestData),
     });
-    csv += row.join(",") + "\n";
-  });
 
-  const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
-  const url = window.URL.createObjectURL(blob);
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
 
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = `manifest_data_${new Date().toISOString().slice(0, 10)}.csv`;
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  window.URL.revokeObjectURL(url);
+    // Download the Excel file
+    const blob = await response.blob();
+    const url = window.URL.createObjectURL(blob);
+
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `Laporan_Bagus_${new Date().toISOString().slice(0, 10)}.xlsx`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    window.URL.revokeObjectURL(url);
+
+    // Restore button
+    button.innerHTML = originalText;
+    button.disabled = false;
+
+    alert(
+      "✅ Excel berhasil didownload!\n\n📋 Laporan_Bagus.xlsx\n📋 Format PT. Alam Raya Indonesia"
+    );
+  } catch (error) {
+    console.error("Error downloading Excel:", error);
+
+    // Restore button
+    const button = document.querySelector('button[onclick="downloadExcel()"]');
+    button.innerHTML = '<i class="fas fa-file-excel mr-2"></i>Download Excel';
+    button.disabled = false;
+
+    alert("❌ Error generating Excel: " + error.message);
+  }
 }
 
 /**
