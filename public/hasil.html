@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Hasil Proses Manifes - Review Data</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+  </head>
+  <body class="bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen">
+    <div class="container mx-auto px-4 py-8">
+      <!-- Header -->
+      <div class="text-center mb-8">
+        <h1 class="text-4xl font-bold text-indigo-900 mb-2">
+          <i class="fas fa-check-circle mr-3 text-green-600"></i>Hasil Proses
+          Manifes
+        </h1>
+        <p class="text-gray-600 text-lg">Data telah dinormalisasi dengan AI</p>
+      </div>
+
+      <!-- Summary Card -->
+      <div class="max-w-7xl mx-auto mb-6">
+        <div class="bg-white rounded-2xl shadow-lg p-6">
+          <div class="grid md:grid-cols-4 gap-4">
+            <div class="text-center p-4 bg-blue-50 rounded-lg">
+              <i class="fas fa-file-excel text-3xl text-blue-600 mb-2"></i>
+              <p class="text-sm text-gray-600">Total Items</p>
+              <p class="text-2xl font-bold text-gray-800" id="totalItems">0</p>
+            </div>
+            <div class="text-center p-4 bg-green-50 rounded-lg">
+              <i class="fas fa-file-invoice text-3xl text-green-600 mb-2"></i>
+              <p class="text-sm text-gray-600">Total B/L</p>
+              <p class="text-2xl font-bold text-gray-800" id="totalBL">0</p>
+            </div>
+            <div class="text-center p-4 bg-purple-50 rounded-lg">
+              <i class="fas fa-robot text-3xl text-purple-600 mb-2"></i>
+              <p class="text-sm text-gray-600">Model AI</p>
+              <p class="text-xl font-bold text-gray-800" id="modelUsed">-</p>
+            </div>
+            <div class="text-center p-4 bg-orange-50 rounded-lg">
+              <i class="fas fa-file text-3xl text-orange-600 mb-2"></i>
+              <p class="text-sm text-gray-600">Filename</p>
+              <p class="text-sm font-bold text-gray-800 truncate" id="fileName">
+                -
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="max-w-7xl mx-auto mb-6">
+        <div class="bg-white rounded-2xl shadow-lg p-6">
+          <div class="flex flex-wrap gap-4 justify-between items-center">
+            <div class="flex flex-wrap gap-3">
+              <button
+                onclick="window.location.href='index.html'"
+                class="bg-gray-600 hover:bg-gray-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors"
+              >
+                <i class="fas fa-arrow-left mr-2"></i>Kembali
+              </button>
+              <button
+                onclick="downloadJSON()"
+                class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors"
+              >
+                <i class="fas fa-download mr-2"></i>Download JSON
+              </button>
+              <button
+                onclick="downloadExcel()"
+                class="bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors"
+              >
+                <i class="fas fa-file-excel mr-2"></i>Download Excel
+              </button>
+            </div>
+            <button
+              onclick="downloadAllZIP()"
+              class="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white font-bold py-3 px-8 rounded-lg transition-colors shadow-lg"
+            >
+              <i class="fas fa-file-archive mr-2"></i>Download ZIP (All PDFs)
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Data Tables (Grouped by B/L) -->
+      <div class="max-w-7xl mx-auto" id="dataContainer">
+        <!-- Loading State -->
+        <div
+          id="loadingState"
+          class="bg-white rounded-2xl shadow-lg p-12 text-center"
+        >
+          <i class="fas fa-spinner fa-spin text-6xl text-indigo-600 mb-4"></i>
+          <p class="text-xl text-gray-600">Memuat data...</p>
+        </div>
+
+        <!-- No Data State -->
+        <div
+          id="noDataState"
+          class="hidden bg-white rounded-2xl shadow-lg p-12 text-center"
+        >
+          <i
+            class="fas fa-exclamation-triangle text-6xl text-yellow-600 mb-4"
+          ></i>
+          <p class="text-xl text-gray-800 mb-2">Tidak ada data</p>
+          <p class="text-gray-600 mb-6">Silakan proses file terlebih dahulu</p>
+          <button
+            onclick="window.location.href='index.html'"
+            class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors"
+          >
+            <i class="fas fa-upload mr-2"></i>Upload File
+          </button>
+        </div>
+
+        <!-- Data will be inserted here -->
+      </div>
+
+      <!-- Footer -->
+      <div class="text-center mt-12 text-gray-500 text-sm">
+        <p>&copy; 2025 Manifes Project. Powered by AI.</p>
+      </div>
+    </div>
+
+    <script src="hasil.js"></script>
+  </body>
+</html>

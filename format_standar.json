@@ -1,0 +1,28 @@
+{
+  "format_standar": {
+    "columns": [
+      "item_no",
+      "description",
+      "hs_code",
+      "quantity",
+      "unit",
+      "unit_price",
+      "total_price",
+      "weight",
+      "volume",
+      "country_of_origin",
+      "bl_number"
+    ],
+    "validation_rules": {
+      "item_no": "required, numeric",
+      "description": "required, string",
+      "quantity": "required, numeric",
+      "unit": "required, string"
+    },
+    "transformations": {
+      "normalize_units": true,
+      "clean_whitespace": true,
+      "validate_numbers": true
+    }
+  }
+}

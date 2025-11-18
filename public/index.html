@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ManifestPro - Solusi Manifest Cargo untuk PKL SMK</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              "apple-blue": "#007AFF",
+              "apple-gray": "#F2F2F7",
+              "apple-dark": "#1D1D1F",
+              "apple-light": "#FBFBFD",
+            },
+            fontFamily: {
+              apple: [
+                "-apple-system",
+                "BlinkMacSystemFont",
+                "SF Pro Display",
+                "Segoe UI",
+                "Roboto",
+                "sans-serif",
+              ],
+            },
+          },
+        },
+      };
+    </script>
+    <style>
+      .gradient-blur {
+        background: linear-gradient(
+          135deg,
+          rgba(0, 122, 255, 0.1) 0%,
+          rgba(88, 86, 214, 0.1) 100%
+        );
+        backdrop-filter: blur(20px);
+      }
+
+      .text-gradient {
+        background: linear-gradient(135deg, #007aff 0%, #5856d6 100%);
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+      }
+
+      .hover-lift {
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+      }
+
+      .hover-lift:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 20px 40px rgba(0, 122, 255, 0.2);
+      }
+
+      .apple-card {
+        background: rgba(255, 255, 255, 0.8);
+        backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+      }
+    </style>
+  </head>
+  <body class="font-apple bg-apple-light">
+    <!-- Navigation -->
+    <nav class="fixed top-0 w-full z-50 gradient-blur border-b border-white/20">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex justify-between items-center h-16">
+          <div class="flex items-center space-x-2">
+            <i class="fas fa-ship text-2xl text-apple-blue"></i>
+            <span class="text-xl font-semibold text-apple-dark"
+              >ManifestPro</span
+            >
+          </div>
+          <div class="hidden md:flex items-center space-x-8">
+            <a
+              href="#home"
+              class="text-apple-dark hover:text-apple-blue transition-colors"
+              >Beranda</a
+            >
+            <a
+              href="#features"
+              class="text-apple-dark hover:text-apple-blue transition-colors"
+              >Fitur</a
+            >
+            <a
+              href="#about"
+              class="text-apple-dark hover:text-apple-blue transition-colors"
+              >Tentang</a
+            >
+            <a
+              href="/upload"
+              class="bg-apple-blue text-white px-4 py-2 rounded-full hover:bg-blue-600 transition-colors"
+            >
+              Mulai Sekarang
+            </a>
+          </div>
+          <div class="md:hidden">
+            <button id="mobile-menu-btn" class="text-apple-dark">
+              <i class="fas fa-bars text-xl"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Mobile Menu -->
+      <div id="mobile-menu" class="hidden md:hidden gradient-blur">
+        <div class="px-2 pt-2 pb-3 space-y-1">
+          <a
+            href="#home"
+            class="block px-3 py-2 text-apple-dark hover:text-apple-blue"
+            >Beranda</a
+          >
+          <a
+            href="#features"
+            class="block px-3 py-2 text-apple-dark hover:text-apple-blue"
+            >Fitur</a
+          >
+          <a
+            href="#about"
+            class="block px-3 py-2 text-apple-dark hover:text-apple-blue"
+            >Tentang</a
+          >
+          <a
+            href="/upload.html"
+            class="block px-3 py-2 bg-apple-blue text-white rounded-lg"
+            >Mulai Sekarang</a
+          >
+        </div>
+      </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section
+      id="home"
+      class="pt-24 pb-20 px-4 bg-gradient-to-br from-apple-light via-blue-50 to-indigo-50"
+    >
+      <div class="max-w-7xl mx-auto text-center">
+        <h1
+          class="text-6xl md:text-7xl font-bold text-apple-dark mb-6 leading-tight"
+        >
+          Manifest Cargo
+          <span class="text-gradient block">Made Simple</span>
+        </h1>
+        <p
+          class="text-xl md:text-2xl text-gray-600 mb-8 max-w-3xl mx-auto leading-relaxed"
+        >
+          Solusi untuk siswa PKL SMK yang kesusahan copy-paste manifest dan
+          menyatukan berbagai data kargo manifest.
+          <strong>Otomatis, Cepat, dan Akurat.</strong>
+        </p>
+
+        <div
+          class="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12"
+        >
+          <a
+            href="/upload.html"
+            class="bg-apple-blue text-white px-8 py-4 rounded-full text-lg font-medium hover:bg-blue-600 transition-all hover-lift"
+          >
+            <i class="fas fa-rocket mr-2"></i>
+            Mulai Upload File
+          </a>
+          <a
+            href="#features"
+            class="text-apple-blue border border-apple-blue px-8 py-4 rounded-full text-lg font-medium hover:bg-apple-blue hover:text-white transition-all"
+          >
+            <i class="fas fa-play-circle mr-2"></i>
+            Lihat Fitur
+          </a>
+        </div>
+
+        <!-- Stats -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto">
+          <div class="apple-card p-6 rounded-2xl hover-lift">
+            <div class="text-3xl font-bold text-apple-blue mb-2">99%</div>
+            <div class="text-gray-600">Akurasi Data</div>
+          </div>
+          <div class="apple-card p-6 rounded-2xl hover-lift">
+            <div class="text-3xl font-bold text-apple-blue mb-2">10x</div>
+            <div class="text-gray-600">Lebih Cepat</div>
+          </div>
+          <div class="apple-card p-6 rounded-2xl hover-lift">
+            <div class="text-3xl font-bold text-apple-blue mb-2">100+</div>
+            <div class="text-gray-600">PKL Terbantu</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="py-20 px-4 bg-white">
+      <div class="max-w-7xl mx-auto">
+        <div class="text-center mb-16">
+          <h2 class="text-5xl font-bold text-apple-dark mb-6">
+            Fitur Unggulan
+          </h2>
+          <p class="text-xl text-gray-600 max-w-3xl mx-auto">
+            Semua yang dibutuhkan siswa PKL untuk mengelola manifest cargo
+            dengan mudah dan profesional
+          </p>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center mb-20">
+          <div class="space-y-6">
+            <div class="flex items-start space-x-4">
+              <div class="bg-apple-blue/10 p-3 rounded-xl">
+                <i class="fas fa-file-excel text-2xl text-apple-blue"></i>
+              </div>
+              <div>
+                <h3 class="text-2xl font-semibold text-apple-dark mb-2">
+                  Upload Excel Otomatis
+                </h3>
+                <p class="text-gray-600">
+                  Upload file manifest Excel dan sistem akan otomatis memproses
+                  dan menormalisasi data dengan AI
+                </p>
+              </div>
+            </div>
+
+            <div class="flex items-start space-x-4">
+              <div class="bg-green-100 p-3 rounded-xl">
+                <i class="fas fa-magic text-2xl text-green-600"></i>
+              </div>
+              <div>
+                <h3 class="text-2xl font-semibold text-apple-dark mb-2">
+                  Normalisasi Data AI
+                </h3>
+                <p class="text-gray-600">
+                  AI akan memperbaiki format data, menyeragamkan nama barang,
+                  dan mengkategorikan cargo secara otomatis
+                </p>
+              </div>
+            </div>
+
+            <div class="flex items-start space-x-4">
+              <div class="bg-purple-100 p-3 rounded-xl">
+                <i class="fas fa-layer-group text-2xl text-purple-600"></i>
+              </div>
+              <div>
+                <h3 class="text-2xl font-semibold text-apple-dark mb-2">
+                  Gabung Multi Manifest
+                </h3>
+                <p class="text-gray-600">
+                  Satukan berbagai file manifest dari berbagai sumber menjadi
+                  satu data yang terorganisir rapi
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div class="apple-card p-8 rounded-3xl hover-lift">
+            <div class="text-center">
+              <i class="fas fa-laptop-code text-6xl text-apple-blue mb-6"></i>
+              <h3 class="text-2xl font-semibold text-apple-dark mb-4">
+                Interface Modern
+              </h3>
+              <p class="text-gray-600">
+                Antarmuka yang mudah digunakan, dibuat khusus untuk siswa PKL
+                yang baru belajar
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Output Features -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div class="apple-card p-8 rounded-3xl text-center hover-lift">
+            <div
+              class="bg-blue-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-6"
+            >
+              <i class="fas fa-file-pdf text-2xl text-blue-600"></i>
+            </div>
+            <h3 class="text-xl font-semibold text-apple-dark mb-4">
+              Export PDF
+            </h3>
+            <p class="text-gray-600">
+              Generate PDF manifest per B/L dengan format professional untuk
+              submit ke atasan
+            </p>
+          </div>
+
+          <div class="apple-card p-8 rounded-3xl text-center hover-lift">
+            <div
+              class="bg-green-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-6"
+            >
+              <i class="fas fa-file-excel text-2xl text-green-600"></i>
+            </div>
+            <h3 class="text-xl font-semibold text-apple-dark mb-4">
+              Excel Styling
+            </h3>
+            <p class="text-gray-600">
+              Laporan Excel dengan styling professional dan data ready untuk Bea
+              Cukai
+            </p>
+          </div>
+
+          <div class="apple-card p-8 rounded-3xl text-center hover-lift">
+            <div
+              class="bg-purple-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-6"
+            >
+              <i class="fas fa-file-archive text-2xl text-purple-600"></i>
+            </div>
+            <h3 class="text-xl font-semibold text-apple-dark mb-4">
+              ZIP Package
+            </h3>
+            <p class="text-gray-600">
+              Download semua file dalam satu ZIP: Excel, PDF, dan laporan
+              summary lengkap
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="py-20 px-4 bg-apple-gray">
+      <div class="max-w-7xl mx-auto">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+          <div>
+            <h2 class="text-5xl font-bold text-apple-dark mb-6">
+              Dibuat untuk
+              <span class="text-gradient">Siswa PKL</span>
+            </h2>
+            <p class="text-xl text-gray-600 mb-6 leading-relaxed">
+              Aplikasi ini lahir dari pengalaman nyata siswa PKL SMK yang
+              kesusahan copy-paste data manifest cargo dari berbagai sumber.
+              Seringkali data tidak konsisten, format berbeda-beda, dan butuh
+              waktu berjam-jam untuk menyatukannya.
+            </p>
+            <p class="text-lg text-gray-600 mb-8">
+              <strong>ManifestPro</strong> hadir untuk menyelesaikan masalah ini
+              dengan teknologi AI yang mudah digunakan, bahkan untuk yang baru
+              pertama kali belajar handling manifest cargo.
+            </p>
+
+            <div class="space-y-4">
+              <div class="flex items-center space-x-3">
+                <i class="fas fa-check-circle text-green-500 text-xl"></i>
+                <span class="text-gray-700"
+                  >Tidak perlu copy-paste manual lagi</span
+                >
+              </div>
+              <div class="flex items-center space-x-3">
+                <i class="fas fa-check-circle text-green-500 text-xl"></i>
+                <span class="text-gray-700"
+                  >Data otomatis ter-normalisasi dan konsisten</span
+                >
+              </div>
+              <div class="flex items-center space-x-3">
+                <i class="fas fa-check-circle text-green-500 text-xl"></i>
+                <span class="text-gray-700"
+                  >Output professional siap untuk atasan</span
+                >
+              </div>
+              <div class="flex items-center space-x-3">
+                <i class="fas fa-check-circle text-green-500 text-xl"></i>
+                <span class="text-gray-700"
+                  >Hemat waktu dari berjam-jam jadi hitungan menit</span
+                >
+              </div>
+            </div>
+          </div>
+
+          <div class="relative">
+            <div class="apple-card p-8 rounded-3xl hover-lift">
+              <div class="text-center">
+                <div
+                  class="bg-yellow-100 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6"
+                >
+                  <i class="fas fa-graduation-cap text-3xl text-yellow-600"></i>
+                </div>
+                <h3 class="text-2xl font-semibold text-apple-dark mb-4">
+                  PKL Success Story
+                </h3>
+                <blockquote class="text-gray-600 italic mb-4">
+                  "Dulu butuh 3-4 jam untuk nyatuin manifest dari berbagai
+                  kapal. Sekarang cuma 10 menit dan hasilnya lebih rapi!"
+                </blockquote>
+                <cite class="text-sm text-gray-500"
+                  >- Ahmad, PKL Logistik SMK Negeri 1 Jakarta</cite
+                >
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="py-20 px-4 bg-gradient-to-br from-apple-blue to-indigo-600">
+      <div class="max-w-4xl mx-auto text-center">
+        <h2 class="text-5xl font-bold text-white mb-6 leading-tight">
+          Siap Memulai?
+        </h2>
+        <p class="text-xl text-blue-100 mb-8 max-w-2xl mx-auto">
+          Upload file manifest Excel Anda sekarang dan rasakan kemudahan
+          mengelola data cargo dengan AI
+        </p>
+
+        <div class="flex flex-col sm:flex-row gap-4 justify-center">
+          <a
+            href="/upload"
+            class="bg-white text-apple-blue px-8 py-4 rounded-full text-lg font-semibold hover:bg-gray-100 transition-all hover-lift"
+          >
+            <i class="fas fa-upload mr-2"></i>
+            Upload File Sekarang
+          </a>
+          <a
+            href="#features"
+            class="border-2 border-white text-white px-8 py-4 rounded-full text-lg font-semibold hover:bg-white hover:text-apple-blue transition-all"
+          >
+            <i class="fas fa-info-circle mr-2"></i>
+            Pelajari Lebih Lanjut
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="py-12 px-4 bg-apple-dark">
+      <div class="max-w-7xl mx-auto">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+          <div class="col-span-2">
+            <div class="flex items-center space-x-2 mb-4">
+              <i class="fas fa-ship text-2xl text-apple-blue"></i>
+              <span class="text-xl font-semibold text-white">ManifestPro</span>
+            </div>
+            <p class="text-gray-400 mb-4 max-w-md">
+              Solusi modern untuk mengelola manifest cargo, dibuat khusus untuk
+              membantu siswa PKL SMK dalam menyelesaikan tugas dengan lebih
+              efisien dan professional.
+            </p>
+            <div class="flex space-x-4">
+              <i
+                class="fab fa-github text-gray-400 hover:text-white text-xl cursor-pointer transition-colors"
+              ></i>
+              <i
+                class="fab fa-linkedin text-gray-400 hover:text-white text-xl cursor-pointer transition-colors"
+              ></i>
+              <i
+                class="fas fa-envelope text-gray-400 hover:text-white text-xl cursor-pointer transition-colors"
+              ></i>
+            </div>
+          </div>
+
+          <div>
+            <h4 class="text-white font-semibold mb-4">Fitur</h4>
+            <ul class="space-y-2 text-gray-400">
+              <li>
+                <a href="#" class="hover:text-white transition-colors"
+                  >Upload Excel</a
+                >
+              </li>
+              <li>
+                <a href="#" class="hover:text-white transition-colors"
+                  >AI Normalisasi</a
+                >
+              </li>
+              <li>
+                <a href="#" class="hover:text-white transition-colors"
+                  >Export PDF</a
+                >
+              </li>
+              <li>
+                <a href="#" class="hover:text-white transition-colors"
+                  >ZIP Package</a
+                >
+              </li>
+            </ul>
+          </div>
+
+          <div>
+            <h4 class="text-white font-semibold mb-4">Support</h4>
+            <ul class="space-y-2 text-gray-400">
+              <li>
+                <a href="#" class="hover:text-white transition-colors"
+                  >Panduan</a
+                >
+              </li>
+              <li>
+                <a href="#" class="hover:text-white transition-colors">FAQ</a>
+              </li>
+              <li>
+                <a href="#" class="hover:text-white transition-colors"
+                  >Kontak</a
+                >
+              </li>
+              <li>
+                <a href="#" class="hover:text-white transition-colors"
+                  >Bug Report</a
+                >
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="border-t border-gray-700 mt-8 pt-8 text-center">
+          <p class="text-gray-400">
+            © 2025 ManifestPro. Dibuat dengan ❤️ untuk siswa PKL SMK Indonesia.
+          </p>
+        </div>
+      </div>
+    </footer>
+
+    <script>
+      // Mobile menu toggle
+      const mobileMenuBtn = document.getElementById("mobile-menu-btn");
+      const mobileMenu = document.getElementById("mobile-menu");
+
+      mobileMenuBtn.addEventListener("click", () => {
+        mobileMenu.classList.toggle("hidden");
+      });
+
+      // Smooth scrolling for anchor links
+      document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
+        anchor.addEventListener("click", function (e) {
+          e.preventDefault();
+          const target = document.querySelector(this.getAttribute("href"));
+          if (target) {
+            target.scrollIntoView({
+              behavior: "smooth",
+              block: "start",
+            });
+          }
+        });
+      });
+
+      // Add scroll effect to navbar
+      window.addEventListener("scroll", () => {
+        const nav = document.querySelector("nav");
+        if (window.scrollY > 50) {
+          nav.classList.add("bg-white/90");
+        } else {
+          nav.classList.remove("bg-white/90");
+        }
+      });
+    </script>
+  </body>
+</html>
