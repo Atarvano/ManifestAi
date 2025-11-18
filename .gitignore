@@ -1,0 +1,8 @@
+# ManifesProject
+
+node_modules/
+.env
+*.log
+uploads/
+temp/
+dist/
