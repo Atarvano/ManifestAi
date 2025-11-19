@@ -1,56 +1,23 @@
-// AI Client - Universal wrapper with automatic fallback
 const geminiClient = require("./geminiClient");
 const groqClient = require("./groqClient");
 
-/**
- * Universal AI call with automatic fallback
- * Priority: Groq (fast & reliable) -> Gemini (fallback)
- * @param {string} prompt - The prompt to send
- * @param {Object} options - Optional configuration
- * @returns {Promise<string>} Text response from AI
- */
 async function callAI(prompt, options = {}) {
-  const errors = [];
-
-  // Try Groq first (faster and more reliable)
   try {
-    console.log("🤖 Trying Groq AI (Llama 3.1)...");
-    const response = await groqClient.callGroq(prompt, options);
-    console.log("✅ Groq AI response received");
-    return response;
+    return await groqClient.callGroq(prompt, options);
   } catch (groqError) {
-    console.warn("⚠️ Groq failed:", groqError.message);
-    errors.push(`Groq: ${groqError.message}`);
+    console.warn("Groq failed, using Gemini:", groqError.message);
+    return await geminiClient.callGemini(prompt, options);
   }
-
-  // Fallback to Gemini
-  try {
-    console.log("🤖 Trying Gemini AI (fallback)...");
-    const response = await geminiClient.callGemini(prompt, options);
-    console.log("✅ Gemini AI response received");
-    return response;
-  } catch (geminiError) {
-    console.warn("⚠️ Gemini failed:", geminiError.message);
-    errors.push(`Gemini: ${geminiError.message}`);
-  }
-
-  // Both failed
-  throw new Error(`All AI providers failed:\n${errors.join("\n")}`);
 }
 
-/**
- * Get HS Code with auto-fallback (Groq → Gemini)
- */
 async function getHSCode(description) {
-  // Try Groq first
   try {
     const hsCode = await groqClient.getHSCode(description);
     if (hsCode && hsCode.length >= 6) return hsCode;
   } catch (error) {
-    // Silent fallback
+    // Silent fallback to Gemini
   }
 
-  // Fallback to Gemini
   try {
     const hsCode = await geminiClient.getHSCode(description);
     if (hsCode && hsCode.length >= 6) return hsCode;
@@ -61,37 +28,17 @@ async function getHSCode(description) {
   return "";
 }
 
-/**
- * Enrich items with HS Codes (auto-fallback)
- */
 async function enrichWithHSCodes(items) {
-  console.log(`🤖 Starting HS Code enrichment for ${items.length} items...`);
-
-  // Try Groq first
   try {
     return await groqClient.enrichWithHSCodes(items);
-  } catch (error) {
-    console.warn("⚠️ Groq failed, trying Gemini...");
-  }
-
-  // Fallback to Gemini
-  try {
+  } catch (groqErr) {
+    console.warn(`Groq failed: ${groqErr.message}, falling back to Gemini`);
     return await geminiClient.enrichWithHSCodes(items);
-  } catch (error) {
-    console.error("❌ All AI providers failed");
-    return items;
   }
 }
 
-/**
- * Test AI connection (both providers)
- * @returns {Promise<Object>} Status of each provider
- */
 async function testAIConnection() {
-  const results = {
-    groq: false,
-    gemini: false,
-  };
+  const results = { groq: false, gemini: false };
 
   try {
     results.groq = await groqClient.testGroqConnection();
@@ -115,8 +62,6 @@ module.exports = {
   getHSCode,
   enrichWithHSCodes,
   testAIConnection,
-
-  // Direct access to specific providers
   groq: groqClient,
   gemini: geminiClient,
 };

@@ -1,0 +1,136 @@
+const axios = require("axios");
+
+async function callGroq(prompt, options = {}) {
+  try {
+    const apiKey = process.env.GROQ_API_KEY;
+    if (!apiKey || apiKey === "gsk_your_groq_api_key_here") {
+      throw new Error("GROQ_API_KEY not configured");
+    }
+
+    const model = options.model || "llama-3.3-70b-versatile";
+    const temperature = options.temperature || 0.3;
+    const maxTokens = options.maxTokens || 8000;
+
+    const response = await axios.post(
+      "https://api.groq.com/openai/v1/chat/completions",
+      {
+        model,
+        messages: [
+          {
+            role: "system",
+            content:
+              "You are a logistics and customs expert specializing in Indonesian shipping manifest data normalization and HS code classification.",
+          },
+          { role: "user", content: prompt },
+        ],
+        temperature,
+        max_tokens: maxTokens,
+        top_p: 0.95,
+        stream: false,
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${apiKey}`,
+          "Content-Type": "application/json",
+        },
+        timeout: 30000,
+      }
+    );
+
+    if (response.data?.choices?.[0]?.message?.content) {
+      const content = response.data.choices[0].message.content.trim();
+      if (!content) throw new Error("Empty response from Groq");
+      return content;
+    }
+
+    throw new Error("Invalid response structure");
+  } catch (error) {
+    if (error.response) {
+      const status = error.response.status;
+      const message = error.response.data?.error?.message || error.message;
+      if (status === 401) throw new Error("Invalid Groq API key");
+      if (status === 429) throw new Error("Rate limit exceeded");
+      throw new Error(`Groq API error (${status}): ${message}`);
+    }
+    if (error.code === "ECONNABORTED") throw new Error("Request timeout");
+    throw new Error(`Groq error: ${error.message}`);
+  }
+}
+
+async function callGroqFast(prompt) {
+  return callGroq(prompt, { model: "llama-3.1-8b-instant" });
+}
+
+async function callGroqPro(prompt) {
+  return callGroq(prompt, { model: "llama-3.3-70b-versatile" });
+}
+
+async function getHSCode(description) {
+  try {
+    if (!description?.trim()) return "";
+
+    const cleanDesc = description.substring(0, 80).trim();
+    const prompt = `What is the 10-digit HS tariff code for: ${cleanDesc}
+
+CRITICAL: Reply with ONLY the 10-digit number. No text, no explanation, just numbers.
+Example correct format: 8421290000`;
+
+    const response = await callGroq(prompt, {
+      model: "llama-3.1-8b-instant",
+      temperature: 0.0,
+      maxTokens: 50,
+    });
+
+    let hsCode = response.replace(/\D/g, "");
+
+    if (hsCode.length >= 4 && hsCode.length < 6) {
+      hsCode = hsCode.padEnd(10, "0");
+    }
+
+    hsCode = hsCode.slice(0, 10);
+    return hsCode.length >= 6 && hsCode.length <= 10 ? hsCode : "";
+  } catch (error) {
+    console.error(`HS Code error: ${error.message}`);
+    return "";
+  }
+}
+
+async function enrichWithHSCodes(items) {
+  const enrichedItems = [];
+
+  for (const item of items) {
+    try {
+      if (item.description) {
+        const hsCode = await getHSCode(item.description);
+        if (hsCode) {
+          item.hs_code = hsCode;
+        }
+      }
+      enrichedItems.push(item);
+    } catch (error) {
+      console.error(`Error enriching item: ${error.message}`);
+      enrichedItems.push(item);
+    }
+  }
+
+  return enrichedItems;
+}
+
+async function testGroqConnection() {
+  try {
+    const response = await callGroqFast('Respond with "OK"');
+    return response.toLowerCase().includes("ok");
+  } catch (error) {
+    console.error("Groq connection test failed:", error.message);
+    return false;
+  }
+}
+
+module.exports = {
+  callGroq,
+  callGroqFast,
+  callGroqPro,
+  getHSCode,
+  enrichWithHSCodes,
+  testGroqConnection,
+};

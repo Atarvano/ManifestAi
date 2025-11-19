@@ -42,6 +42,11 @@ exports.generateZip = async (req, res) => {
 
     console.log(`📊 Total items with B/L numbers: ${allItems.length}`);
 
+    // Enrich all items with HS Codes once
+    console.log(`🤖 Enriching ${allItems.length} items with HS Codes...`);
+    const enrichedItems = await enrichWithHSCodes(allItems);
+    console.log(`✅ HS Code enrichment complete`);
+
     // Create ZIP archive
     const archive = archiver("zip", { zlib: { level: 9 } });
 
@@ -60,12 +65,12 @@ exports.generateZip = async (req, res) => {
 
     // 1. Generate Laporan_Bagus.xlsx (styled Excel)
     console.log("📄 Creating Laporan_Bagus.xlsx...");
-    const styledExcelBuffer = await createStyledExcel(allItems, metadata);
+    const styledExcelBuffer = await createStyledExcel(enrichedItems, metadata);
     archive.append(styledExcelBuffer, { name: "Laporan_Bagus.xlsx" });
 
     // 2. Generate Data_BeaCukai.xlsx (raw data)
     console.log("📄 Creating Data_BeaCukai.xlsx...");
-    const rawExcelBuffer = await createRawExcel(allItems, metadata);
+    const rawExcelBuffer = await createRawExcel(enrichedItems, metadata);
     archive.append(rawExcelBuffer, { name: "Data_BeaCukai.xlsx" });
 
     // 3. Generate PDFs per B/L (if requested)
@@ -139,10 +144,7 @@ exports.generateZip = async (req, res) => {
 /**
  * Create styled Excel report - PT. ALEXINDO YAKIN PRIMA Format
  */
-async function createStyledExcel(allItems, metadata) {
-  // Enrich with HS Codes
-  const enrichedItems = await enrichWithHSCodes(allItems);
-
+async function createStyledExcel(enrichedItems, metadata) {
   const workbook = new ExcelJS.Workbook();
   workbook.creator = "PT. ALEXINDO YAKIN PRIMA";
   workbook.lastModifiedBy = "ManifestPro AI";
@@ -425,7 +427,7 @@ async function createStyledExcel(allItems, metadata) {
 /**
  * Create raw Excel data (Data_BeaCukai.xlsx)
  */
-async function createRawExcel(allItems, metadata) {
+async function createRawExcel(enrichedItems, metadata) {
   const workbook = new ExcelJS.Workbook();
   const worksheet = workbook.addWorksheet("Data Manifest");
 
@@ -448,7 +450,7 @@ async function createRawExcel(allItems, metadata) {
   worksheet.addRow(headers);
 
   // Add data rows
-  allItems.forEach((item) => {
+  enrichedItems.forEach((item) => {
     const row = headers.map((header) => item[header] || "");
     worksheet.addRow(row);
   });

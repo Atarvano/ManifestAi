@@ -73,9 +73,24 @@ CONTOH FORMAT OUTPUT:
     "weight": 250.5,
     "volume": 1.5,
     "country_of_origin": "Indonesia",
-    "bl_number": null
+    "bl_number": null,
+    "marks": "CONTAINER123",
+    "seal_number": "SEAL456",
+    "shipper": "PT. Eksportir Indonesia",
+    "shipper_address": "Jl. Sudirman No. 123, Jakarta",
+    "consignee": "ABC Company Ltd",
+    "consignee_address": "123 Main Street, Singapore",
+    "notify_party": "ABC Company Ltd",
+    "notify_address": "123 Main Street, Singapore",
+    "npwp": "01.234.567.8-901.000"
   }
 ]
+
+PENTING:
+- Jika data shipper/consignee/address tidak ada di Excel, gunakan placeholder yang masuk akal
+- Shipper biasanya nama perusahaan Indonesia
+- Consignee biasanya nama perusahaan tujuan
+- NPWP format: XX.XXX.XXX.X-XXX.XXX
 
 Output Anda (hanya JSON array):`;
 
