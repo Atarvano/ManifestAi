@@ -28,11 +28,11 @@ exports.proses = async (req, res) => {
     uploadedFilePath = req.file.path;
 
     // 2. Validate model source
-    const modelSource = req.body.modelSource || "gemini";
-    if (!["gemini", "deepseek"].includes(modelSource)) {
+    const modelSource = req.body.modelSource || "groq";
+    if (!["gemini", "deepseek", "groq"].includes(modelSource)) {
       return res.status(400).json({
         success: false,
-        error: 'Invalid modelSource. Use "gemini" or "deepseek".',
+        error: 'Invalid modelSource. Use "gemini", "deepseek", or "groq".',
       });
     }
 

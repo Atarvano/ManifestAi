@@ -1,7 +1,8 @@
-// Utility functions untuk API calls (Gemini, DeepSeek)
+// Utility functions untuk API calls (Gemini, DeepSeek, Groq)
 const axios = require("axios");
 const { callGemini } = require("./geminiClient");
 const { callDeepseek } = require("./deepseekClient");
+const { callGroq } = require("./groqClient");
 
 /**
  * Call Gemini API
@@ -32,8 +33,22 @@ async function callDeepSeekAPI(prompt) {
 }
 
 /**
+ * Call Groq API (Llama 3.1 - Fast & Free)
+ * @param {string} prompt - The prompt to send
+ * @returns {Promise<string>} AI response
+ */
+async function callGroqAPI(prompt) {
+  try {
+    // Use the dedicated Groq client (llama-3.1-70b-versatile by default)
+    return await callGroq(prompt);
+  } catch (error) {
+    throw new Error(`Groq API error: ${error.message}`);
+  }
+}
+
+/**
  * Call AI based on model source
- * @param {string} modelSource - 'gemini' or 'deepseek'
+ * @param {string} modelSource - 'gemini', 'deepseek', or 'groq'
  * @param {string} prompt - The prompt to send
  * @returns {Promise<string>} AI response
  */
@@ -42,9 +57,11 @@ async function callAI(modelSource, prompt) {
     return await callGeminiAPI(prompt);
   } else if (modelSource === "deepseek") {
     return await callDeepSeekAPI(prompt);
+  } else if (modelSource === "groq") {
+    return await callGroqAPI(prompt);
   } else {
     throw new Error(
-      `Invalid model source: ${modelSource}. Use 'gemini' or 'deepseek'`
+      `Invalid model source: ${modelSource}. Use 'gemini', 'deepseek', or 'groq'`
     );
   }
 }
@@ -52,5 +69,6 @@ async function callAI(modelSource, prompt) {
 module.exports = {
   callGeminiAPI,
   callDeepSeekAPI,
+  callGroqAPI,
   callAI,
 };

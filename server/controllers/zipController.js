@@ -3,6 +3,7 @@ const ExcelJS = require("exceljs");
 const puppeteer = require("puppeteer");
 const fs = require("fs");
 const path = require("path");
+const { enrichWithHSCodes } = require("../utils/aiClient"); // Universal AI client
 
 /**
  * POST /api/generate-zip - Production ready
@@ -28,13 +29,18 @@ exports.generateZip = async (req, res) => {
 
     console.log(`📋 Processing ${Object.keys(groupedData).length} B/L groups`);
 
-    // Prepare all manifest data
+    // Prepare all manifest data and filter out items without B/L numbers
     const allItems = [];
     Object.values(groupedData).forEach((items) => {
-      allItems.push(...items);
+      items.forEach((item) => {
+        // Skip items without B/L number (null, undefined, empty string)
+        if (item.bl_number && item.bl_number.trim() !== "") {
+          allItems.push(item);
+        }
+      });
     });
 
-    console.log(`📊 Total items: ${allItems.length}`);
+    console.log(`📊 Total items with B/L numbers: ${allItems.length}`);
 
     // Create ZIP archive
     const archive = archiver("zip", { zlib: { level: 9 } });
@@ -131,123 +137,132 @@ exports.generateZip = async (req, res) => {
 };
 
 /**
- * Create styled Excel report (Laporan_Bagus.xlsx)
+ * Create styled Excel report - PT. ALEXINDO YAKIN PRIMA Format
  */
 async function createStyledExcel(allItems, metadata) {
-  const workbook = new ExcelJS.Workbook();
+  // Enrich with HS Codes
+  const enrichedItems = await enrichWithHSCodes(allItems);
 
-  // Set workbook properties
-  workbook.creator = "PT. Alam Raya Indonesia";
-  workbook.lastModifiedBy = "Manifes Project";
+  const workbook = new ExcelJS.Workbook();
+  workbook.creator = "PT. ALEXINDO YAKIN PRIMA";
+  workbook.lastModifiedBy = "ManifestPro AI";
   workbook.created = new Date();
   workbook.modified = new Date();
 
   const worksheet = workbook.addWorksheet("MANIFEST", {
-    pageSetup: { paperSize: 9, orientation: "landscape" }, // A4 landscape
+    pageSetup: { paperSize: 9, orientation: "landscape" },
   });
 
-  // Company Header - PT. Alam Raya Indonesia
-  worksheet.mergeCells("A1:G4");
+  // Company Header - PT. ALEXINDO YAKIN PRIMA
+  worksheet.mergeCells("A1:D1");
   const companyCell = worksheet.getCell("A1");
-  companyCell.value =
-    "PT. Alam Raya Indonesia\nBellagio Office Park\nQL2/50-52 Mega Kuningan\nJakarta 12950 - Indonesia\nPhone: +62 21 30455153 - 53\nFax: +62 21 30455154\nEmail: shipping@ptari.com / ho@ptari.com";
+  companyCell.value = "PT. ALEXINDO YAKIN PRIMA";
   companyCell.font = {
     name: "Arial",
-    size: 10,
-    bold: false,
-  };
-  companyCell.alignment = {
-    vertical: "top",
-    horizontal: "left",
-    wrapText: true,
-  };
-
-  // Document Title
-  worksheet.mergeCells("A6:G6");
-  const titleCell1 = worksheet.getCell("A6");
-  titleCell1.value = "PERUSAHAAN PELAYARAN";
-  titleCell1.font = {
-    name: "Arial",
-    size: 12,
+    size: 11,
     bold: true,
   };
-  titleCell1.alignment = {
+  companyCell.alignment = {
     vertical: "middle",
-    horizontal: "center",
+    horizontal: "left",
   };
 
-  worksheet.mergeCells("A7:G7");
-  const titleCell2 = worksheet.getCell("A7");
-  titleCell2.value = "PT. ALAM RAYA INDONESIA";
-  titleCell2.font = {
+  // Perusahaan Pelayaran Nasional subtitle
+  worksheet.mergeCells("A2:D2");
+  const subtitleCell = worksheet.getCell("A2");
+  subtitleCell.value = "Perusahaan Pelayaran Nasional";
+  subtitleCell.font = {
+    name: "Arial",
+    size: 9,
+    bold: false,
+  };
+  subtitleCell.alignment = {
+    vertical: "middle",
+    horizontal: "left",
+  };
+
+  // MANIFEST OF CARGO Title
+  worksheet.mergeCells("A4:M4");
+  const manifestCell = worksheet.getCell("A4");
+  manifestCell.value = "MANIFEST OF CARGO";
+  manifestCell.font = {
     name: "Arial",
     size: 14,
     bold: true,
-  };
-  titleCell2.alignment = {
-    vertical: "middle",
-    horizontal: "center",
-  };
-
-  worksheet.mergeCells("A8:G8");
-  const manifestCell = worksheet.getCell("A8");
-  manifestCell.value = "MANIFEST";
-  manifestCell.font = {
-    name: "Arial",
-    size: 16,
-    bold: true,
-    underline: true,
   };
   manifestCell.alignment = {
     vertical: "middle",
     horizontal: "center",
   };
 
-  // Ship Details Section (Left Side)
-  const detailsRow = 10;
-  worksheet.getCell(`A${detailsRow}`).value = "Name of ship";
-  worksheet.getCell(`B${detailsRow}`).value = ":";
-  worksheet.getCell(`C${detailsRow}`).value = metadata?.shipName || "";
+  // Shipping Details Row (Row 5)
+  const detailsRow = 5;
 
-  worksheet.getCell(`A${detailsRow + 1}`).value = "Master of Ship";
-  worksheet.getCell(`B${detailsRow + 1}`).value = ":";
-  worksheet.getCell(`C${detailsRow + 1}`).value = metadata?.masterName || "";
+  // Left section - SHIPPED PER
+  worksheet.getCell(`A${detailsRow}`).value = "SHIPPED PER :";
+  worksheet.getCell(`A${detailsRow}`).font = { bold: true, size: 9 };
+  worksheet.getCell(`B${detailsRow}`).value =
+    metadata?.shipName || "KM. SUMBER ABADI 178";
+  worksheet.getCell(`B${detailsRow}`).font = { bold: true, size: 9 };
 
-  worksheet.getCell(`A${detailsRow + 2}`).value = "Sailed On";
-  worksheet.getCell(`B${detailsRow + 2}`).value = ":";
-  worksheet.getCell(`C${detailsRow + 2}`).value =
-    metadata?.sailedDate || new Date().toLocaleDateString("id-ID");
+  // Voy section
+  worksheet.getCell(`C${detailsRow}`).value = "* Voy :";
+  worksheet.getCell(`C${detailsRow}`).font = { bold: true, size: 9 };
+  worksheet.getCell(`D${detailsRow}`).value = metadata?.voyage || "SA16JB-25";
+  worksheet.getCell(`D${detailsRow}`).font = { bold: true, size: 9 };
 
-  // Cargo Details Section (Right Side)
-  worksheet.getCell(`E${detailsRow}`).value = "Cargo Shipped From";
-  worksheet.getCell(`F${detailsRow}`).value = ":";
-  worksheet.getCell(`G${detailsRow}`).value = metadata?.cargoFrom || "";
+  // Right section - NATIONALITY
+  worksheet.getCell(`J${detailsRow}`).value = "NATIONALITY :";
+  worksheet.getCell(`J${detailsRow}`).font = { bold: true, size: 9 };
+  worksheet.getCell(`K${detailsRow}`).value = `"${
+    metadata?.nationality || "INDONESIA"
+  }"`;
+  worksheet.getCell(`K${detailsRow}`).font = { bold: true, size: 9 };
 
-  worksheet.getCell(`E${detailsRow + 1}`).value = "Cargo Shipped To";
-  worksheet.getCell(`F${detailsRow + 1}`).value = ":";
-  worksheet.getCell(`G${detailsRow + 1}`).value = metadata?.cargoTo || "";
+  // MASTER
+  worksheet.getCell(`L${detailsRow}`).value = "MASTER:";
+  worksheet.getCell(`L${detailsRow}`).font = { bold: true, size: 9 };
+  worksheet.getCell(`M${detailsRow}`).value =
+    metadata?.masterName || "IVAN PRI HARYANTO";
+  worksheet.getCell(`M${detailsRow}`).font = { bold: true, size: 9 };
 
-  worksheet.getCell(`E${detailsRow + 2}`).value = "Nationality";
-  worksheet.getCell(`F${detailsRow + 2}`).value = ":";
-  worksheet.getCell(`G${detailsRow + 2}`).value =
-    metadata?.nationality || "Indonesia";
+  // Row 6 - FROM and TO info
+  const fromToRow = 6;
+  worksheet.getCell(`A${fromToRow}`).value = "FROM :";
+  worksheet.getCell(`A${fromToRow}`).font = { bold: true, size: 9 };
+  worksheet.mergeCells(`B${fromToRow}:E${fromToRow}`);
+  worksheet.getCell(`B${fromToRow}`).value =
+    metadata?.cargoFrom || "SUNDA KELAPA - JAKARTA";
+  worksheet.getCell(`B${fromToRow}`).font = { size: 9 };
 
-  // Style the detail labels
-  for (let i = 0; i < 3; i++) {
-    worksheet.getCell(`A${detailsRow + i}`).font = { bold: true, size: 10 };
-    worksheet.getCell(`E${detailsRow + i}`).font = { bold: true, size: 10 };
-  }
+  worksheet.getCell(`J${fromToRow}`).value = "TO:";
+  worksheet.getCell(`J${fromToRow}`).font = { bold: true, size: 9 };
+  worksheet.getCell(`K${fromToRow}`).value =
+    metadata?.cargoTo || "BATU AMPAR - BATAM";
+  worksheet.getCell(`K${fromToRow}`).font = { size: 9 };
 
-  // Table Headers (Standard Manifest Format)
-  const headerRow = detailsRow + 5;
+  worksheet.getCell(`L${fromToRow}`).value = "SAILING ON:";
+  worksheet.getCell(`L${fromToRow}`).font = { bold: true, size: 9 };
+  worksheet.getCell(`M${fromToRow}`).value =
+    metadata?.sailedDate || "08 NOYEMBER 2025";
+  worksheet.getCell(`M${fromToRow}`).font = { size: 9 };
+
+  // Table Headers (Row 7-8: Two-row header style)
+  const headerRow = 7;
   const headers = [
-    "BL No.",
-    "Description Of Goods",
-    "Shipper",
-    "Consignee",
-    "Collies",
-    "Weight (Ton / M³)",
-    "Remarks",
+    "B/L\nNO.",
+    "HS\nCODE",
+    "MARK AND\nNUMBERS",
+    "SEAL\nNO.",
+    "DESCRIPTION OF GOODS",
+    "WEIGHT",
+    "SHIPPER",
+    "ADDRESS",
+    "CONSIGNEE",
+    "ADDRESS",
+    "NO. IDENTITAS\nCONSIGNEE",
+    "NOTIFY PARTY\nCONSIGNEE",
+    "ADDRESS",
   ];
 
   headers.forEach((header, index) => {
@@ -256,37 +271,46 @@ async function createStyledExcel(allItems, metadata) {
     cell.font = {
       bold: true,
       color: { argb: "FF000000" },
-      size: 11,
+      size: 8,
     };
     cell.alignment = {
       vertical: "middle",
       horizontal: "center",
       wrapText: true,
     };
+    cell.fill = {
+      type: "pattern",
+      pattern: "solid",
+      fgColor: { argb: "FFD3D3D3" }, // Light gray background
+    };
     cell.border = {
-      top: { style: "medium", color: { argb: "FF000000" } },
-      left: { style: "medium", color: { argb: "FF000000" } },
-      bottom: { style: "medium", color: { argb: "FF000000" } },
-      right: { style: "medium", color: { argb: "FF000000" } },
+      top: { style: "thin", color: { argb: "FF000000" } },
+      left: { style: "thin", color: { argb: "FF000000" } },
+      bottom: { style: "thin", color: { argb: "FF000000" } },
+      right: { style: "thin", color: { argb: "FF000000" } },
     };
   });
 
-  // Data rows with standard manifest format
-  allItems.forEach((item, index) => {
-    const row = headerRow + 1 + index;
-    const weightTon = item.weight
-      ? (parseFloat(item.weight) / 1000).toFixed(3)
-      : "0.000";
-    const volumeM3 = item.volume ? parseFloat(item.volume).toFixed(3) : "0.000";
+  // Data rows with PT. ALEXINDO format (starting from row 8, removed hardcoded "1 Unit" row)
+  const dataStartRow = 8;
+  enrichedItems.forEach((item, index) => {
+    const row = dataStartRow + index;
+    const weightKg = item.weight ? parseFloat(item.weight).toFixed(3) : "0.000";
 
     const rowData = [
       item.bl_number || "",
+      item.hs_code || "", // HS Code from Gemini AI
+      item.marks || item.container_number || "",
+      item.seal_number || item.container_number || "",
       item.description || "",
+      weightKg,
       item.shipper || item.exporter || "",
+      item.shipper_address || "",
       item.consignee || item.importer || "",
-      item.quantity || "",
-      `${weightTon} T / ${volumeM3} M³`,
-      item.remarks || "",
+      item.consignee_address || "",
+      item.identity_number || item.npwp || "",
+      item.notify_party || item.consignee || item.importer || "",
+      item.notify_address || item.consignee_address || "",
     ];
 
     rowData.forEach((value, colIndex) => {
@@ -301,15 +325,18 @@ async function createStyledExcel(allItems, metadata) {
         right: { style: "thin", color: { argb: "FF000000" } },
       };
 
-      // Alignment
-      if (colIndex === 0 || colIndex === 4) {
-        // BL No. and Collies - center align
-        cell.alignment = { horizontal: "center", vertical: "middle" };
-      } else if (colIndex === 5) {
-        // Weight - center align
+      // Alignment for PT. ALEXINDO format (13 columns)
+      if (
+        colIndex === 0 ||
+        colIndex === 1 ||
+        colIndex === 3 ||
+        colIndex === 5 ||
+        colIndex === 10
+      ) {
+        // BL, HS Code, Seal No, Weight, Identity Number - center align
         cell.alignment = { horizontal: "center", vertical: "middle" };
       } else {
-        // Others - left align
+        // Others - left align with wrap text for addresses and descriptions
         cell.alignment = {
           horizontal: "left",
           vertical: "middle",
@@ -317,59 +344,58 @@ async function createStyledExcel(allItems, metadata) {
         };
       }
 
-      cell.font = { size: 10 };
+      cell.font = { size: 8 };
     });
   });
 
-  // Set column widths for standard manifest format
-  const columnWidths = [12, 30, 20, 20, 8, 15, 15];
+  // Set column widths for PT. ALEXINDO YAKIN PRIMA format (13 columns)
+  const columnWidths = [8, 8, 12, 8, 28, 10, 15, 18, 15, 18, 12, 15, 18];
   columnWidths.forEach((width, index) => {
     worksheet.getColumn(index + 1).width = width;
   });
 
   // TOTAL row
-  const totalRow = headerRow + allItems.length + 1;
-  worksheet.mergeCells(`A${totalRow}:D${totalRow}`);
+  const totalRow = dataStartRow + enrichedItems.length;
+  worksheet.mergeCells(`A${totalRow}:E${totalRow}`);
   const totalCell = worksheet.getCell(`A${totalRow}`);
   totalCell.value = "TOTAL";
-  totalCell.font = { bold: true, size: 11 };
+  totalCell.font = { bold: true, size: 10 };
   totalCell.alignment = { horizontal: "center", vertical: "middle" };
   totalCell.border = {
-    top: { style: "medium", color: { argb: "FF000000" } },
-    left: { style: "medium", color: { argb: "FF000000" } },
-    bottom: { style: "medium", color: { argb: "FF000000" } },
-    right: { style: "medium", color: { argb: "FF000000" } },
+    top: { style: "thin", color: { argb: "FF000000" } },
+    left: { style: "thin", color: { argb: "FF000000" } },
+    bottom: { style: "thin", color: { argb: "FF000000" } },
+    right: { style: "thin", color: { argb: "FF000000" } },
   };
 
   // Total calculations
-  const totalWeight =
-    allItems.reduce((sum, item) => sum + (parseFloat(item.weight) || 0), 0) /
-    1000; // Convert to tons
-  const totalVolume = allItems.reduce(
-    (sum, item) => sum + (parseFloat(item.volume) || 0),
-    0
-  );
-  const totalCollies = allItems.reduce(
-    (sum, item) => sum + (parseInt(item.quantity) || 0),
+  const totalWeight = enrichedItems.reduce(
+    (sum, item) => sum + (parseFloat(item.weight) || 0),
     0
   );
 
-  worksheet.getCell(`E${totalRow}`).value = totalCollies;
-  worksheet.getCell(`F${totalRow}`).value = `${totalWeight.toFixed(
-    3
-  )} T / ${totalVolume.toFixed(3)} M³`;
-  worksheet.getCell(`G${totalRow}`).value = "";
+  worksheet.getCell(`F${totalRow}`).value = `${totalWeight.toFixed(3)}`;
 
-  // Style total row cells
-  for (let col = 5; col <= 7; col++) {
+  // Style total weight cell
+  const totalWeightCell = worksheet.getCell(`F${totalRow}`);
+  totalWeightCell.font = { bold: true, size: 10 };
+  totalWeightCell.alignment = { horizontal: "center", vertical: "middle" };
+  totalWeightCell.border = {
+    top: { style: "thin", color: { argb: "FF000000" } },
+    left: { style: "thin", color: { argb: "FF000000" } },
+    bottom: { style: "thin", color: { argb: "FF000000" } },
+    right: { style: "thin", color: { argb: "FF000000" } },
+  };
+
+  // Style remaining empty total row cells (G to M)
+  for (let col = 7; col <= 13; col++) {
     const cell = worksheet.getCell(totalRow, col);
-    cell.font = { bold: true, size: 10 };
-    cell.alignment = { horizontal: "center", vertical: "middle" };
+    cell.value = "";
     cell.border = {
-      top: { style: "medium", color: { argb: "FF000000" } },
-      left: { style: "medium", color: { argb: "FF000000" } },
-      bottom: { style: "medium", color: { argb: "FF000000" } },
-      right: { style: "medium", color: { argb: "FF000000" } },
+      top: { style: "thin", color: { argb: "FF000000" } },
+      left: { style: "thin", color: { argb: "FF000000" } },
+      bottom: { style: "thin", color: { argb: "FF000000" } },
+      right: { style: "thin", color: { argb: "FF000000" } },
     };
   }
 
@@ -673,23 +699,19 @@ exports.generateExcel = async (req, res) => {
     const groupedData = manifestData.groupedData || manifestData;
     const metadata = manifestData.metadata || {};
 
-    console.log(
-      "🔍 Debug manifestData:",
-      JSON.stringify(manifestData, null, 2)
-    );
-    console.log("🔍 Debug groupedData:", JSON.stringify(groupedData, null, 2));
-    console.log(`📋 Processing ${Object.keys(groupedData).length} B/L groups`);
-
-    // Prepare all manifest data
+    // Prepare manifest items
     const allItems = [];
     Object.values(groupedData).forEach((items) => {
       allItems.push(...items);
     });
 
-    console.log(`📊 Total items: ${allItems.length}`);
+    console.log(
+      `📊 Generating Excel for ${allItems.length} items from ${
+        Object.keys(groupedData).length
+      } B/L groups`
+    );
 
-    // Generate styled Excel with PT. Alam Raya Indonesia format
-    console.log("📄 Creating Laporan_Bagus.xlsx...");
+    // Generate Excel
     const excelBuffer = await createStyledExcel(allItems, metadata);
 
     // Set response headers for Excel download

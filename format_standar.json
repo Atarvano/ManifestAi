@@ -11,18 +11,29 @@
       "weight",
       "volume",
       "country_of_origin",
-      "bl_number"
+      "bl_number",
+      "marks",
+      "seal_number",
+      "shipper",
+      "shipper_address",
+      "consignee",
+      "consignee_address",
+      "notify_party",
+      "notify_address",
+      "npwp"
     ],
     "validation_rules": {
       "item_no": "required, numeric",
       "description": "required, string",
-      "quantity": "required, numeric",
-      "unit": "required, string"
+      "quantity": "numeric",
+      "unit": "string",
+      "bl_number": "required, string"
     },
     "transformations": {
       "normalize_units": true,
       "clean_whitespace": true,
-      "validate_numbers": true
+      "validate_numbers": true,
+      "extract_shipping_info": true
     }
   }
 }
