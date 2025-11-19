@@ -67,7 +67,10 @@ async function callGroqPro(prompt) {
 
 async function getHSCode(description) {
   try {
-    if (!description?.trim()) return "";
+    if (!description?.trim()) {
+      console.log(`[getHSCode] Empty description`);
+      return "";
+    }
 
     const cleanDesc = description.substring(0, 80).trim();
     const prompt = `What is the 10-digit HS tariff code for: ${cleanDesc}
@@ -75,11 +78,15 @@ async function getHSCode(description) {
 CRITICAL: Reply with ONLY the 10-digit number. No text, no explanation, just numbers.
 Example correct format: 8421290000`;
 
+    console.log(`[getHSCode] Calling Groq for: "${cleanDesc}"`);
+
     const response = await callGroq(prompt, {
       model: "llama-3.1-8b-instant",
       temperature: 0.0,
       maxTokens: 50,
     });
+
+    console.log(`[getHSCode] Raw response: "${response}"`);
 
     let hsCode = response.replace(/\D/g, "");
 
@@ -88,32 +95,123 @@ Example correct format: 8421290000`;
     }
 
     hsCode = hsCode.slice(0, 10);
-    return hsCode.length >= 6 && hsCode.length <= 10 ? hsCode : "";
+    const isValid = hsCode.length >= 6 && hsCode.length <= 10;
+    console.log(`[getHSCode] Final: "${hsCode}" (valid=${isValid})`);
+    return isValid ? hsCode : "";
   } catch (error) {
     console.error(`HS Code error: ${error.message}`);
     return "";
   }
 }
 
-async function enrichWithHSCodes(items) {
-  const enrichedItems = [];
+async function enrichWithHSCodesBatch(items) {
+  try {
+    const validItems = items.filter((item) => item.description);
+    if (validItems.length === 0) return items;
 
-  for (const item of items) {
+    console.log(
+      `\n🚀 [Batch] Processing ${validItems.length} items in 1 request...`
+    );
+
+    const itemsList = validItems
+      .map((item, idx) => `${idx + 1}. ${item.description.substring(0, 100)}`)
+      .join("\n");
+
+    const prompt = `Generate 10-digit HS tariff codes for these products (Indonesia format).
+
+Products:
+${itemsList}
+
+CRITICAL OUTPUT - Reply ONLY with valid JSON array, no explanation:
+[
+  {"index": 1, "hs_code": "8421290000"},
+  {"index": 2, "hs_code": "8409991000"}
+]
+
+Rules:
+- Exactly 10 digits
+- Valid HS code structure
+- NO text outside JSON`;
+
+    const response = await callGroq(prompt, {
+      model: "llama-3.1-70b-versatile",
+      temperature: 0.1,
+      maxTokens: validItems.length * 100 + 500,
+    });
+
+    const jsonMatch = response.match(/\[[\s\S]*\]/);
+    if (!jsonMatch) throw new Error("No JSON array in response");
+
+    const hsCodes = JSON.parse(jsonMatch[0]);
+    console.log(`✅ [Batch] Parsed ${hsCodes.length} HS codes`);
+
+    let enrichedCount = 0;
+    items.forEach((item, itemIdx) => {
+      if (item.description) {
+        const validItemIdx = validItems.findIndex((v) => v === item);
+        const hsData = hsCodes.find((h) => h.index === validItemIdx + 1);
+
+        if (hsData?.hs_code) {
+          const cleaned = hsData.hs_code
+            .toString()
+            .replace(/\D/g, "")
+            .slice(0, 10);
+          if (cleaned.length >= 6) {
+            item.hs_code = cleaned.padEnd(10, "0");
+            enrichedCount++;
+          }
+        }
+      }
+    });
+
+    console.log(`🎉 [Batch] Enriched ${enrichedCount}/${items.length} items\n`);
+    return items;
+  } catch (error) {
+    console.error(`❌ [Batch] Failed: ${error.message}`);
+    console.log(`⚠️ [Batch] Falling back to sequential with delay...\n`);
+    return await enrichWithHSCodesSequential(items);
+  }
+}
+
+async function enrichWithHSCodesSequential(items) {
+  const enrichedItems = [];
+  console.log(
+    `🐢 [Sequential] Processing ${items.length} items with 2s delay...`
+  );
+
+  for (let i = 0; i < items.length; i++) {
+    const item = items[i];
     try {
       if (item.description) {
         const hsCode = await getHSCode(item.description);
         if (hsCode) {
           item.hs_code = hsCode;
+          console.log(`✅ Item ${i + 1}/${items.length}: ${hsCode}`);
+        }
+
+        if (i < items.length - 1) {
+          await new Promise((resolve) => setTimeout(resolve, 2000));
         }
       }
       enrichedItems.push(item);
     } catch (error) {
-      console.error(`Error enriching item: ${error.message}`);
+      console.error(`❌ Item ${i + 1}: ${error.message}`);
       enrichedItems.push(item);
     }
   }
 
   return enrichedItems;
+}
+
+async function enrichWithHSCodes(items) {
+  // Auto-select: Batch for >10 items, Sequential for <=10 items
+  if (items.length > 10) {
+    console.log(`📊 Auto-selecting BATCH mode for ${items.length} items`);
+    return await enrichWithHSCodesBatch(items);
+  } else {
+    console.log(`📊 Auto-selecting SEQUENTIAL mode for ${items.length} items`);
+    return await enrichWithHSCodesSequential(items);
+  }
 }
 
 async function testGroqConnection() {
@@ -132,5 +230,7 @@ module.exports = {
   callGroqPro,
   getHSCode,
   enrichWithHSCodes,
+  enrichWithHSCodesBatch,
+  enrichWithHSCodesSequential,
   testGroqConnection,
 };

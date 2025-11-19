@@ -31,68 +31,38 @@ function buildAIPrompt(formatStandar, csvData, userInstruction = "") {
       ? columns.join(", ")
       : "item_no, description, quantity, unit, price";
 
-  let prompt = `Anda adalah asisten untuk membersihkan dan menstrukturkan data manifes kargo.
+  let prompt = `You are an expert logistics data specialist for Indonesian shipping manifests. Transform messy Excel data into clean, professional cargo manifest format.
 
-TUGAS ANDA:
-1. Ambil data CSV mentah di bawah ini
-2. Normalisasikan berdasarkan kolom standar yang diberikan
-3. Ekstrak item_no dari urutan baris (jika tidak ada, buat berurutan dari 1)
-4. Pastikan setiap kolom terisi sesuai standar (jika kosong, gunakan null atau string kosong)
-5. Jika ada data gabungan (misalnya: nama + alamat + NPWP dalam satu kolom), pisahkan secara logis ke kolom yang sesuai
-6. Bersihkan whitespace, karakter tidak valid, dan format data yang tidak konsisten
-7. Hasil akhir wajib berupa JSON array yang valid
-8. JANGAN menambahkan komentar, penjelasan, atau markdown formatting - HANYA JSON valid
+CONTEXT: Input data is POOR quality - expect typos, inconsistent formats, abbreviations, missing fields.
 
-KOLOM STANDAR:
-${columnsList}
+CLEANING TASKS:
+1. Fix typos & expand abbreviations (Flmtec→Filmtec)
+2. Standardize units: PCS, CT, BX, KG, L, UNIT, SET, ROLL, PK
+3. Extract quantity as NUMBER, unit separately
+4. Clean descriptions: professional format, remove junk text
+5. Format companies properly (PT., Ltd, Inc)
+6. Split combined data intelligently (name+address+NPWP → separate fields)
+7. NPWP format: XX.XXX.XXX.X-XXX.XXX or null
 
-${userInstruction ? `INSTRUKSI TAMBAHAN USER:\n${userInstruction}\n` : ""}
+STANDARD COLUMNS: ${columnsList}
 
-DATA CSV MENTAH:
+${userInstruction ? `USER INSTRUCTIONS:\n${userInstruction}\n` : ""}
+RAW CSV DATA:
 ${csvData}
 
-ATURAN OUTPUT:
-- Response WAJIB berupa JSON array murni
-- Setiap item adalah object dengan kolom standar di atas
-- item_no harus berupa angka dan berurutan
-- Jangan gunakan markdown code blocks atau formatting apapun
-- Jangan tambahkan teks penjelasan
-- Format angka dengan benar (quantity, price, weight, volume sebagai number)
-- Format string dengan konsisten (trim whitespace)
+OUTPUT RULES:
+✓ ONLY valid JSON array - NO markdown, NO text outside JSON
+✓ Each object has all standard columns (use null/"" if missing)
+✓ item_no: sequential numbers (1,2,3...)
+✓ quantity/price/weight/volume: numbers (not strings)
+✓ bl_number: null (auto-generated later)
+✓ hs_code: null or "" (auto-generated later)
+✓ Trim strings, capitalize properly
 
-CONTOH FORMAT OUTPUT:
-[
-  {
-    "item_no": 1,
-    "description": "Barang Contoh",
-    "hs_code": "1234567890",
-    "quantity": 100,
-    "unit": "PCS",
-    "unit_price": 50.00,
-    "total_price": 5000.00,
-    "weight": 250.5,
-    "volume": 1.5,
-    "country_of_origin": "Indonesia",
-    "bl_number": null,
-    "marks": "CONTAINER123",
-    "seal_number": "SEAL456",
-    "shipper": "PT. Eksportir Indonesia",
-    "shipper_address": "Jl. Sudirman No. 123, Jakarta",
-    "consignee": "ABC Company Ltd",
-    "consignee_address": "123 Main Street, Singapore",
-    "notify_party": "ABC Company Ltd",
-    "notify_address": "123 Main Street, Singapore",
-    "npwp": "01.234.567.8-901.000"
-  }
-]
+CONCISE EXAMPLE:
+[{"item_no":1,"description":"Filmtec RO Membrane BW30","quantity":4,"unit":"CT","weight":100.0,"shipper":"PT. Hantech","consignee":"ABC Ltd","bl_number":null,"hs_code":null}]
 
-PENTING:
-- Jika data shipper/consignee/address tidak ada di Excel, gunakan placeholder yang masuk akal
-- Shipper biasanya nama perusahaan Indonesia
-- Consignee biasanya nama perusahaan tujuan
-- NPWP format: XX.XXX.XXX.X-XXX.XXX
-
-Output Anda (hanya JSON array):`;
+Your complete JSON array (all ${csvData.split("\n").length} items):`;
 
   return prompt;
 }

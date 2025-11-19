@@ -7,7 +7,7 @@ async function callGemini(prompt, options = {}) {
 
     const model = options.model || "gemini-2.5-flash";
     const temperature = options.temperature || 0.3;
-    const maxTokens = options.maxTokens || 8000;
+    const maxTokens = options.maxTokens || 32000; // Increased for large datasets
 
     const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
 
@@ -34,7 +34,7 @@ async function callGemini(prompt, options = {}) {
           },
         ],
       },
-      { headers: { "Content-Type": "application/json" }, timeout: 60000 }
+      { headers: { "Content-Type": "application/json" }, timeout: 120000 } // Increased timeout
     );
 
     const textResponse =

@@ -146,7 +146,7 @@ exports.generateZip = async (req, res) => {
  */
 async function createStyledExcel(enrichedItems, metadata) {
   const workbook = new ExcelJS.Workbook();
-  workbook.creator = "PT. ALEXINDO YAKIN PRIMA";
+  workbook.creator = "PT. ISHIP LINTAS BAHARI";
   workbook.lastModifiedBy = "ManifestPro AI";
   workbook.created = new Date();
   workbook.modified = new Date();
@@ -158,7 +158,7 @@ async function createStyledExcel(enrichedItems, metadata) {
   // Company Header - PT. ALEXINDO YAKIN PRIMA
   worksheet.mergeCells("A1:D1");
   const companyCell = worksheet.getCell("A1");
-  companyCell.value = "PT. ALEXINDO YAKIN PRIMA";
+  companyCell.value = "PT. ISHIP LINTAS BAHARI";
   companyCell.font = {
     name: "Arial",
     size: 11,
@@ -256,6 +256,8 @@ async function createStyledExcel(enrichedItems, metadata) {
     "HS\nCODE",
     "MARK AND\nNUMBERS",
     "SEAL\nNO.",
+    "QTY",
+    "UNIT",
     "DESCRIPTION OF GOODS",
     "WEIGHT",
     "SHIPPER",
@@ -293,18 +295,47 @@ async function createStyledExcel(enrichedItems, metadata) {
     };
   });
 
-  // Data rows with PT. ALEXINDO format (starting from row 8, removed hardcoded "1 Unit" row)
-  const dataStartRow = 8;
+  // Container info row (Row 8) - Merge only QTY and UNIT columns (E and F)
+  const containerRow = 8;
+  worksheet.mergeCells(`E${containerRow}:F${containerRow}`);
+  const containerCell = worksheet.getCell(`E${containerRow}`);
+  containerCell.value = "1 Unit    Container 20 feet etc";
+  containerCell.font = { bold: true, size: 9 };
+  containerCell.alignment = { horizontal: "left", vertical: "middle" };
+  containerCell.border = {
+    top: { style: "thin", color: { argb: "FF000000" } },
+    left: { style: "thin", color: { argb: "FF000000" } },
+    bottom: { style: "thin", color: { argb: "FF000000" } },
+    right: { style: "thin", color: { argb: "FF000000" } },
+  };
+
+  // Style other cells in container row (A, B, C, D, G to O)
+  const containerRowCells = [1, 2, 3, 4, 7, 8, 9, 10, 11, 12, 13, 14, 15];
+  containerRowCells.forEach((col) => {
+    const cell = worksheet.getCell(containerRow, col);
+    cell.value = "";
+    cell.border = {
+      top: { style: "thin", color: { argb: "FF000000" } },
+      left: { style: "thin", color: { argb: "FF000000" } },
+      bottom: { style: "thin", color: { argb: "FF000000" } },
+      right: { style: "thin", color: { argb: "FF000000" } },
+    };
+  });
+
+  // Data rows - Each item is ONE ROW (starting from row 9)
+  const dataStartRow = 9;
   enrichedItems.forEach((item, index) => {
     const row = dataStartRow + index;
     const weightKg = item.weight ? parseFloat(item.weight).toFixed(3) : "0.000";
 
     const rowData = [
       item.bl_number || "",
-      item.hs_code || "", // HS Code from Gemini AI
+      item.hs_code || "", // HS Code from AI
       item.marks || item.container_number || "",
       item.seal_number || item.container_number || "",
-      item.description || "",
+      item.quantity || "", // QTY column (separate)
+      item.unit || "", // UNIT column (separate)
+      item.description || "", // DESCRIPTION only
       weightKg,
       item.shipper || item.exporter || "",
       item.shipper_address || "",
@@ -327,15 +358,17 @@ async function createStyledExcel(enrichedItems, metadata) {
         right: { style: "thin", color: { argb: "FF000000" } },
       };
 
-      // Alignment for PT. ALEXINDO format (13 columns)
+      // Alignment for PT. ALEXINDO format (15 columns now: added QTY and UNIT)
       if (
         colIndex === 0 ||
         colIndex === 1 ||
         colIndex === 3 ||
+        colIndex === 4 ||
         colIndex === 5 ||
-        colIndex === 10
+        colIndex === 7 ||
+        colIndex === 12
       ) {
-        // BL, HS Code, Seal No, Weight, Identity Number - center align
+        // BL, HS Code, Seal No, QTY, UNIT, Weight, Identity Number - center align
         cell.alignment = { horizontal: "center", vertical: "middle" };
       } else {
         // Others - left align with wrap text for addresses and descriptions
@@ -350,15 +383,15 @@ async function createStyledExcel(enrichedItems, metadata) {
     });
   });
 
-  // Set column widths for PT. ALEXINDO YAKIN PRIMA format (13 columns)
-  const columnWidths = [8, 8, 12, 8, 28, 10, 15, 18, 15, 18, 12, 15, 18];
+  // Set column widths for PT. ALEXINDO YAKIN PRIMA format (15 columns now)
+  const columnWidths = [8, 8, 12, 8, 6, 6, 28, 10, 15, 18, 15, 18, 12, 15, 18];
   columnWidths.forEach((width, index) => {
     worksheet.getColumn(index + 1).width = width;
   });
 
   // TOTAL row
   const totalRow = dataStartRow + enrichedItems.length;
-  worksheet.mergeCells(`A${totalRow}:E${totalRow}`);
+  worksheet.mergeCells(`A${totalRow}:G${totalRow}`);
   const totalCell = worksheet.getCell(`A${totalRow}`);
   totalCell.value = "TOTAL";
   totalCell.font = { bold: true, size: 10 };
@@ -376,10 +409,10 @@ async function createStyledExcel(enrichedItems, metadata) {
     0
   );
 
-  worksheet.getCell(`F${totalRow}`).value = `${totalWeight.toFixed(3)}`;
+  worksheet.getCell(`H${totalRow}`).value = `${totalWeight.toFixed(3)}`;
 
   // Style total weight cell
-  const totalWeightCell = worksheet.getCell(`F${totalRow}`);
+  const totalWeightCell = worksheet.getCell(`H${totalRow}`);
   totalWeightCell.font = { bold: true, size: 10 };
   totalWeightCell.alignment = { horizontal: "center", vertical: "middle" };
   totalWeightCell.border = {
@@ -389,8 +422,8 @@ async function createStyledExcel(enrichedItems, metadata) {
     right: { style: "thin", color: { argb: "FF000000" } },
   };
 
-  // Style remaining empty total row cells (G to M)
-  for (let col = 7; col <= 13; col++) {
+  // Style remaining empty total row cells (I to O - 15 columns now)
+  for (let col = 9; col <= 15; col++) {
     const cell = worksheet.getCell(totalRow, col);
     cell.value = "";
     cell.border = {
