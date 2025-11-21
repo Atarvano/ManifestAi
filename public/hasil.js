@@ -1,17 +1,10 @@
-// Global variables
 let manifestData = null;
 let groupedData = {};
 
-/**
- * Initialize page when DOM is loaded
- */
 document.addEventListener("DOMContentLoaded", function () {
   loadManifestData();
 });
 
-/**
- * Load manifest data from sessionStorage
- */
 function loadManifestData() {
   try {
     const data = sessionStorage.getItem("manifestData");
@@ -21,28 +14,15 @@ function loadManifestData() {
     }
 
     manifestData = JSON.parse(data);
-    console.log("📋 Loaded manifest data:", manifestData);
-
-    // Update summary
     updateSummary();
-
-    // Group data by B/L number
     groupDataByBL();
-
-    // Render tables
     renderGroupedTables();
-
-    // Hide loading state
     hideLoadingState();
   } catch (error) {
-    console.error("❌ Error loading data:", error);
     showNoDataState();
   }
 }
 
-/**
- * Update summary cards
- */
 function updateSummary() {
   const totalItems = manifestData.data ? manifestData.data.length : 0;
   const modelUsed = manifestData.metadata?.modelUsed || "Unknown";
@@ -52,7 +32,6 @@ function updateSummary() {
   document.getElementById("modelUsed").textContent = modelUsed.toUpperCase();
   document.getElementById("fileName").textContent = fileName;
 
-  // Count unique B/L numbers
   const uniqueBL = new Set();
   if (manifestData.data) {
     manifestData.data.forEach((item) => {
@@ -64,9 +43,6 @@ function updateSummary() {
   document.getElementById("totalBL").textContent = uniqueBL.size;
 }
 
-/**
- * Group data by B/L number
- */
 function groupDataByBL() {
   groupedData = {};
 
@@ -81,20 +57,12 @@ function groupDataByBL() {
 
     groupedData[blNumber].push(item);
   });
-
-  console.log("📊 Grouped data by B/L:", groupedData);
 }
 
-/**
- * Render grouped tables
- */
 function renderGroupedTables() {
   const container = document.getElementById("dataContainer");
-
-  // Clear existing content
   container.innerHTML = "";
 
-  // Sort B/L numbers
   const sortedBLNumbers = Object.keys(groupedData).sort();
 
   sortedBLNumbers.forEach((blNumber) => {
@@ -104,9 +72,6 @@ function renderGroupedTables() {
   });
 }
 
-/**
- * Create table card for each B/L group
- */
 function createTableCard(blNumber, items) {
   const card = document.createElement("div");
   card.className = "bg-white rounded-2xl shadow-lg mb-6 overflow-hidden";
@@ -135,7 +100,6 @@ function createTableCard(blNumber, items) {
   const table = document.createElement("table");
   table.className = "w-full";
 
-  // Table header
   const thead = document.createElement("thead");
   thead.className = "bg-gray-50";
   thead.innerHTML = `
@@ -153,7 +117,6 @@ function createTableCard(blNumber, items) {
         </tr>
     `;
 
-  // Table body
   const tbody = document.createElement("tbody");
   tbody.className = "bg-white divide-y divide-gray-200";
 
@@ -205,41 +168,28 @@ function createTableCard(blNumber, items) {
   return card;
 }
 
-/**
- * Show loading state
- */
 function hideLoadingState() {
   document.getElementById("loadingState").classList.add("hidden");
 }
 
-/**
- * Show no data state
- */
 function showNoDataState() {
   document.getElementById("loadingState").classList.add("hidden");
   document.getElementById("noDataState").classList.remove("hidden");
 }
 
-/**
- * Generate PDF for specific B/L
- */
 async function generatePDFForBL(blNumber) {
   try {
-    console.log(`📄 Generating PDF for B/L: ${blNumber}`);
-
     const items = groupedData[blNumber];
     if (!items || items.length === 0) {
       alert("❌ Tidak ada data untuk B/L ini");
       return;
     }
 
-    // Show loading
     const btn = event.target;
     const originalText = btn.innerHTML;
     btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Generating...';
     btn.disabled = true;
 
-    // Send data to PDF endpoint
     const response = await fetch("/api/generate-pdf", {
       method: "POST",
       headers: {
@@ -255,7 +205,6 @@ async function generatePDFForBL(blNumber) {
       throw new Error("Gagal generate PDF");
     }
 
-    // Download PDF
     const blob = await response.blob();
     const url = window.URL.createObjectURL(blob);
     const a = document.createElement("a");
@@ -266,38 +215,28 @@ async function generatePDFForBL(blNumber) {
     document.body.removeChild(a);
     window.URL.revokeObjectURL(url);
 
-    console.log("✅ PDF downloaded successfully");
   } catch (error) {
-    console.error("❌ Error generating PDF:", error);
     alert("❌ Error: " + error.message);
   } finally {
-    // Reset button
     const btn = event.target;
     btn.innerHTML = originalText;
     btn.disabled = false;
   }
 }
 
-/**
- * Download all PDFs as ZIP
- */
 async function downloadAllZIP() {
   try {
-    console.log("📦 Generating ZIP with all PDFs...");
-
     if (!manifestData || !manifestData.data) {
       alert("❌ Tidak ada data untuk diproses");
       return;
     }
 
-    // Show loading
     const btn = event.target;
     const originalText = btn.innerHTML;
     btn.innerHTML =
       '<i class="fas fa-spinner fa-spin mr-2"></i>Creating ZIP...';
     btn.disabled = true;
 
-    // Send all data to ZIP endpoint
     const response = await fetch("/api/generate-zip", {
       method: "POST",
       headers: {
@@ -313,7 +252,6 @@ async function downloadAllZIP() {
       throw new Error("Gagal generate ZIP");
     }
 
-    // Download ZIP
     const blob = await response.blob();
     const url = window.URL.createObjectURL(blob);
     const a = document.createElement("a");
@@ -324,21 +262,15 @@ async function downloadAllZIP() {
     document.body.removeChild(a);
     window.URL.revokeObjectURL(url);
 
-    console.log("✅ ZIP downloaded successfully");
   } catch (error) {
-    console.error("❌ Error generating ZIP:", error);
     alert("❌ Error: " + error.message);
   } finally {
-    // Reset button
     const btn = event.target;
     btn.innerHTML = originalText;
     btn.disabled = false;
   }
 }
 
-/**
- * Download data as JSON
- */
 function downloadJSON() {
   if (!manifestData) {
     alert("❌ Tidak ada data untuk didownload");
@@ -358,9 +290,6 @@ function downloadJSON() {
   window.URL.revokeObjectURL(url);
 }
 
-/**
- * Download styled Excel with PT. Alam Raya Indonesia format
- */
 async function downloadExcel() {
   if (!manifestData || !manifestData.data) {
     alert("❌ Tidak ada data untuk didownload");
@@ -368,17 +297,15 @@ async function downloadExcel() {
   }
 
   try {
-    // Show loading
     const button = document.querySelector('button[onclick="downloadExcel()"]');
     const originalText = button.innerHTML;
     button.innerHTML =
       '<i class="fas fa-spinner fa-spin mr-2"></i>Generating Excel...';
     button.disabled = true;
 
-    // Prepare data for ZIP endpoint
     const requestData = {
       manifestData: {
-        groupedData: groupedData, // Use global groupedData variable
+        groupedData: groupedData,
         metadata: {
           filename: manifestData.metadata?.filename || "manifest.xlsx",
           modelUsed: manifestData.metadata?.modelUsed || "gemini",
@@ -390,7 +317,7 @@ async function downloadExcel() {
           nationality: "Indonesia",
         },
       },
-      includePDFs: false, // Only generate Excel files
+      includePDFs: false,
     };
 
     const response = await fetch("/api/generate-excel", {
@@ -405,7 +332,6 @@ async function downloadExcel() {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
 
-    // Download the Excel file
     const blob = await response.blob();
     const url = window.URL.createObjectURL(blob);
 
@@ -417,7 +343,6 @@ async function downloadExcel() {
     document.body.removeChild(a);
     window.URL.revokeObjectURL(url);
 
-    // Restore button
     button.innerHTML = originalText;
     button.disabled = false;
 
@@ -425,9 +350,6 @@ async function downloadExcel() {
       "✅ Excel berhasil didownload!\n\n📋 Laporan_Bagus.xlsx\n📋 Format PT. Alam Raya Indonesia"
     );
   } catch (error) {
-    console.error("Error downloading Excel:", error);
-
-    // Restore button
     const button = document.querySelector('button[onclick="downloadExcel()"]');
     button.innerHTML = '<i class="fas fa-file-excel mr-2"></i>Download Excel';
     button.disabled = false;
@@ -436,17 +358,11 @@ async function downloadExcel() {
   }
 }
 
-/**
- * Format number with thousand separators
- */
 function formatNumber(num) {
   if (!num && num !== 0) return "";
   return Number(num).toLocaleString("id-ID");
 }
 
-/**
- * Format currency to Indonesian Rupiah
- */
 function formatCurrency(num) {
   if (!num && num !== 0) return "";
   return new Intl.NumberFormat("id-ID", {
@@ -456,23 +372,15 @@ function formatCurrency(num) {
     maximumFractionDigits: 2,
   }).format(num);
 }
-/**
- * Open CEISA Modal
- */
+
 function openCeisaModal() {
   document.getElementById("ceisaModal").classList.remove("hidden");
 }
 
-/**
- * Close CEISA Modal
- */
 function closeCeisaModal() {
   document.getElementById("ceisaModal").classList.add("hidden");
 }
 
-/**
- * Generate CEISA Excel from current data
- */
 async function generateCeisaFromData() {
   if (!manifestData || !manifestData.data) {
     alert("❌ Tidak ada data untuk diproses");
@@ -485,7 +393,6 @@ async function generateCeisaFromData() {
   btn.disabled = true;
 
   try {
-    // Collect Metadata
     const metadata = {
       nomorAju: document.getElementById("nomorAju").value,
       npwp: document.getElementById("npwp").value,
@@ -500,14 +407,13 @@ async function generateCeisaFromData() {
       negara: document.getElementById("negara").value
     };
 
-    // Send to Backend
     const response = await fetch("/api/generate-ceisa-json", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        manifestData: manifestData.data, // Send the array of items
+        manifestData: manifestData.data,
         metadata: metadata
       }),
     });
@@ -520,7 +426,6 @@ async function generateCeisaFromData() {
     const result = await response.json();
 
     if (result.success) {
-      // Download File
       const a = document.createElement("a");
       a.href = result.downloadUrl;
       a.download = result.downloadUrl.split("/").pop();
@@ -535,7 +440,6 @@ async function generateCeisaFromData() {
     }
 
   } catch (error) {
-    console.error("Error generating CEISA:", error);
     alert("❌ Gagal: " + error.message);
   } finally {
     btn.innerHTML = originalText;

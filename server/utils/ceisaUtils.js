@@ -1,14 +1,5 @@
 const { generateBL } = require("./generateBLNumber");
 
-/**
- * CEISA Manifest Utilities
- * Handles normalization, validation, and mapping for CEISA format.
- */
-
-// ==========================================
-// 1. NORMALIZATION & VALIDATION
-// ==========================================
-
 function cleanBLNumber(bl) {
   if (!bl) return "";
   let cleaned = bl.toString().toUpperCase().replace(/[^A-Z0-9\/\-]/g, "");
@@ -22,7 +13,6 @@ function validateContainer(cntr) {
   
   if (cleaned.length !== 11) return { valid: false, cleaned, error: "Length != 11" };
   
-  // Basic ISO check
   const owner = cleaned.substring(0, 4);
   if (!/^[A-Z]{4}$/.test(owner)) return { valid: false, cleaned, error: "Invalid Owner Code" };
   
@@ -57,15 +47,6 @@ function fixNumber(val) {
   return parseFloat(str) || 0;
 }
 
-// ==========================================
-// 2. MAPPING TO CEISA STRUCTURE
-// ==========================================
-
-/**
- * Map normalized data to CEISA JSON structure
- * @param {Array} rawData - Array of objects from Excel/CSV
- * @param {Object} metadata - Additional info (Header info)
- */
 function generateRandomDigits(length) {
   let result = "";
   for (let i = 0; i < length; i++) {
@@ -74,11 +55,6 @@ function generateRandomDigits(length) {
   return result;
 }
 
-/**
- * Map normalized data to CEISA JSON structure
- * @param {Array} rawData - Array of objects from Excel/CSV
- * @param {Object} metadata - Additional info (Header info)
- */
 function mapToCEISA(rawData, metadata = {}) {
   const result = {
     header: [],
@@ -90,29 +66,21 @@ function mapToCEISA(rawData, metadata = {}) {
     respon_header: []
   };
 
-  // Generate Session Prefix (8 digits) for this manifest
-  // Example: 11569519
   const SESSION_PREFIX = generateRandomDigits(8);
-
-  // Helper to generate full ID
   const generateID = () => SESSION_PREFIX + generateRandomDigits(8);
 
-  // Common Data
-  const NOMOR_AJU = "0000" + Date.now(); // Placeholder
+  const NOMOR_AJU = "0000" + Date.now();
   const ID_DATA = generateID();
   const KPPBC = metadata.kppbc || "";
 
-  // Calculate Totals
   const totalPos = rawData.length;
   const totalKemasan = rawData.reduce((sum, row) => sum + fixNumber(row.quantity), 0);
   const totalKontainer = rawData.filter(row => row.container_no).length;
   const totalBruto = rawData.reduce((sum, row) => sum + fixNumber(row.gross_weight), 0);
   const totalVolume = rawData.reduce((sum, row) => sum + fixNumber(row.volume), 0);
 
-  // 1. HEADER
-  // Columns: NOMOR AJU, ID DATA, NPWP, JNS MANIFEST, KD JNS MANIFEST, KPPBC, NO BC 10, TGL BC 10, NO BC 11, TGL BC 11, NAMA SARANA ANGKUT, KODE MODA, CALL SIGN, NO IMO, NO_MMSI, NEGARA, NO VOYAGE / ARRIVAL, DEPARTURE FLIGHT, NAHKODA, HANDLING AGENT, PELABUHAN ASAL, PELABUHAN TRANSIT, PELABUHAN BONGKAR, PELABUHAN SELANJUTNYA, KADE, TGL TIBA, JAM TIBA, TGL KEDATANGAN, JAM KEDATANGAN, TGL BONGKAR, JAM BONGKAR, TGL MUAT, JAM MUAT, TGL KEBERANGKATAN, JAM KEBERANGKATAN, TOTAL POS, TOTAL KEMASAN, TOTAL KONTAINER, TOTAL MASTER BL/AWB, TOTAL BRUTO, TOTAL VOLUME, FLAG NIHIL, STATUS, NO PERBAIKAN, TGL PERBAIKAN, SERI PERBAIKAN, PEMBERITAHU, LENGKAP, USER, ID ASAL DATA, ID MODUL, WAKTU REKAM, WAKTU UPDATE, VERSI MODUL
   result.header.push({
-    "NOMOR AJU": "18090503900520251106000560", // Example format
+    "NOMOR AJU": "18090503900520251106000560",
     "ID DATA": ID_DATA,
     "NPWP": "029839123215000",
     "JNS MANIFEST": "IS",
@@ -123,7 +91,7 @@ function mapToCEISA(rawData, metadata = {}) {
     "NO BC 11": "",
     "TGL BC 11": "",
     "NAMA SARANA ANGKUT": metadata.saranaAngkut || "",
-    "KODE MODA": "1", // 1=Laut
+    "KODE MODA": "1",
     "CALL SIGN": metadata.callSign || "",
     "NO IMO": metadata.noImo || "",
     "NO_MMSI": "",
@@ -150,7 +118,7 @@ function mapToCEISA(rawData, metadata = {}) {
     "TOTAL POS": totalPos,
     "TOTAL KEMASAN": totalKemasan,
     "TOTAL KONTAINER": totalKontainer,
-    "TOTAL MASTER BL/AWB": "1", // Assuming 1 Master BL for now
+    "TOTAL MASTER BL/AWB": "1",
     "TOTAL BRUTO": totalBruto,
     "TOTAL VOLUME": totalVolume,
     "FLAG NIHIL": "N",
@@ -168,7 +136,6 @@ function mapToCEISA(rawData, metadata = {}) {
     "VERSI MODUL": "2002"
   });
 
-  // Process Rows
   let noPosCounter = 1;
 
   rawData.forEach((row, index) => {
@@ -178,8 +145,6 @@ function mapToCEISA(rawData, metadata = {}) {
     const ID_DETIL = generateID();
     const ID_MASTER = generateID(); 
 
-    // 2. MASTER
-    // Columns: ID MASTER, NOMOR AJU, KD KELOMPOK POS, NO MASTER BL/AWB, TGL MASTER BL/AWB, JML HOST BL/AWB, RESPON
     result.master.push({
       "ID MASTER": ID_MASTER,
       "NOMOR AJU": "18090503900520251106000560",
@@ -190,8 +155,6 @@ function mapToCEISA(rawData, metadata = {}) {
       "RESPON": ""
     });
 
-    // 3. DETIL
-    // Columns: ID DETIL, ID MASTER, NOMOR AJU, KD KELOMPOK POS, NO POS, NO SUB POS, NO SUB SUB POS, NO MASTER BLAWB, TGL MASTER BLAWB, NO HOST BLAWB, TGL HOST BLAWB, MOTHER VESSEL, NPWP CONSIGNEE, NAMA CONSIGNEE, ALMT CONSIGNEE, NEG CONSIGNEE, NPWP SHIPPER, NAMA SHIPPER, ALMT SHIPPER, NEG SHIPPER, NAMA NOTIFY, ALMT NOTIFY, NEG NOTIFY, PELABUHAN ASAL, PELABUHAN TRANSIT, PELABUHAN BONGKAR, PELABUHAN AKHIR, JUMLAH KEMASAN, JENIS KEMASAN, MERK KEMASAN, JUMLAH KONTAINER, BRUTO, VOLUME, FL PARTIAL, TOTAL KEMASAN, TOTAL KONTAINER, STATUS DETIL, FL KONSOLIDASI, FL PECAH, FL PERBAIKAN, JENIS ID SHIPPER, JENIS ID CONSIGNEE
     result.detil.push({
       "ID DETIL": ID_DETIL,
       "ID MASTER": ID_MASTER,
@@ -237,8 +200,6 @@ function mapToCEISA(rawData, metadata = {}) {
       "JENIS ID CONSIGNEE": ""
     });
 
-    // 4. BARANG
-    // Columns: ID BARANG, ID DETIL, SERI BARANG, HS CODE, URAIAN BARANG
     result.barang.push({
       "ID BARANG": generateID(),
       "ID DETIL": ID_DETIL,
@@ -247,19 +208,15 @@ function mapToCEISA(rawData, metadata = {}) {
       "URAIAN BARANG": row.description || ""
     });
 
-    // 5. DOKUMEN
-    // Columns: ID DOKUMEN, ID DETIL, KODE DOKUMEN, NOMOR DOKUMEN, TANGGAL DOKUMEN, KODE KANTOR
     result.dokumen.push({
       "ID DOKUMEN": generateID(),
       "ID DETIL": ID_DETIL,
-      "KODE DOKUMEN": "705", // Kode Invoice usually
+      "KODE DOKUMEN": "705",
       "NOMOR DOKUMEN": "INV-" + hbl,
       "TANGGAL DOKUMEN": new Date().toISOString().split('T')[0],
       "KODE KANTOR": KPPBC
     });
 
-    // 6. KONTAINER
-    // Columns: ID KONTAINER, ID DETIL, SERI KONTAINER, NOMOR KONTAINER, UKURAN KONTAINER, TIPE KONTAINER, JENIS KONTAINER, NOMOR SEGEL, STATUS KONTAINER
     if (row.container_no) {
       const cntrVal = validateContainer(row.container_no);
       result.kontainer.push({
@@ -268,7 +225,7 @@ function mapToCEISA(rawData, metadata = {}) {
         "SERI KONTAINER": "1",
         "NOMOR KONTAINER": cntrVal.cleaned,
         "UKURAN KONTAINER": row.container_size || "20",
-        "TIPE KONTAINER": "1", // General Purpose
+        "TIPE KONTAINER": "1",
         "JENIS KONTAINER": "",
         "NOMOR SEGEL": "",
         "STATUS KONTAINER": "FCL"

@@ -59,7 +59,6 @@
         background-color: #F5F5F7;
       }
 
-      /* Modal Animation */
       @keyframes modalFadeIn {
         from { opacity: 0; transform: scale(0.95); }
         to { opacity: 1; transform: scale(1); }
@@ -71,7 +70,6 @@
   </head>
   <body class="min-h-screen flex flex-col">
     
-    <!-- Navbar -->
     <nav class="nav-blur sticky top-0 z-50">
       <div class="container mx-auto px-6 h-16 flex justify-between items-center">
         <div class="flex items-center gap-3">
@@ -89,7 +87,6 @@
 
     <main class="flex-grow container mx-auto px-4 py-12 max-w-7xl">
       
-      <!-- Header Section -->
       <div class="flex flex-col md:flex-row justify-between items-end mb-10 gap-6">
         <div>
           <h1 class="text-4xl font-bold text-gray-900 mb-2 tracking-tight">Hasil Analisis</h1>
@@ -105,7 +102,6 @@
         </div>
       </div>
 
-      <!-- Stats Grid -->
       <div class="grid grid-cols-2 md:grid-cols-4 gap-6 mb-12">
         <div class="stat-card">
           <div class="flex items-center gap-3 mb-2 text-blue-600">
@@ -148,7 +144,6 @@
         </div>
       </div>
 
-      <!-- Action Bar -->
       <div class="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 mb-8 flex flex-wrap gap-4 justify-center md:justify-start">
         <button onclick="downloadJSON()" class="apple-btn bg-gray-50 hover:bg-gray-100 text-gray-700 font-medium py-2 px-5 text-sm border border-gray-200">
           <i class="fas fa-code mr-2"></i>JSON
@@ -161,15 +156,12 @@
         </button>
       </div>
 
-      <!-- Data Container -->
       <div id="dataContainer" class="space-y-8">
-        <!-- Loading State -->
         <div id="loadingState" class="text-center py-20">
           <div class="w-16 h-16 border-4 border-blue-100 border-t-blue-600 rounded-full animate-spin mx-auto mb-4"></div>
           <p class="text-gray-500 font-medium">Memuat data...</p>
         </div>
 
-        <!-- No Data State -->
         <div id="noDataState" class="hidden text-center py-20 bg-white rounded-3xl border border-dashed border-gray-200">
           <div class="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-4">
             <i class="fas fa-inbox text-3xl text-gray-300"></i>
@@ -182,7 +174,6 @@
         </div>
       </div>
 
-      <!-- CEISA Modal -->
       <div id="ceisaModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4">
         <div class="absolute inset-0 bg-black/30 backdrop-blur-sm" onclick="closeCeisaModal()"></div>
         <div class="modal-content bg-white rounded-3xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto relative z-10">
@@ -200,7 +191,6 @@
           <div class="p-8">
             <form id="ceisaForm" class="space-y-8">
               <div class="grid md:grid-cols-2 gap-8">
-                <!-- Left Column -->
                 <div class="space-y-5">
                   <h4 class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-4">Data Dokumen</h4>
                   
@@ -234,7 +224,6 @@
                   </div>
                 </div>
 
-                <!-- Right Column -->
                 <div class="space-y-5">
                   <h4 class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-4">Data Angkutan</h4>
                   
@@ -276,7 +265,6 @@
         </div>
       </div>
 
-      <!-- Footer -->
       <footer class="text-center mt-16 text-gray-400 text-sm font-medium">
         <p>&copy; 2025 Manifes Project. Designed by Atarvano.</p>
       </footer>

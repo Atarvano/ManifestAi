@@ -1,22 +1,14 @@
 const ExcelJS = require("exceljs");
 
-/**
- * Generate CEISA Excel File
- * Creates a 7-sheet workbook matching the strict user-provided structure.
- * @param {Object} data - The mapped CEISA data object
- * @param {string} outputPath - Path to save the file
- */
 async function generateCEISAExcel(data, outputPath) {
   const workbook = new ExcelJS.Workbook();
   workbook.creator = "ManifestPro AI";
   workbook.created = new Date();
 
-  // Helper to add columns
   const addColumns = (sheet, colDefs) => {
     sheet.columns = colDefs.map(name => ({ header: name, key: name, width: 20 }));
   };
 
-  // 1. Header
   const sheetHeader = workbook.addWorksheet("Header");
   addColumns(sheetHeader, [
     "NOMOR AJU", "ID DATA", "NPWP", "JNS MANIFEST", "KD JNS MANIFEST", 
@@ -35,7 +27,6 @@ async function generateCEISAExcel(data, outputPath) {
   ]);
   if (data.header) sheetHeader.addRows(data.header);
 
-  // 2. Master
   const sheetMaster = workbook.addWorksheet("Master entry");
   addColumns(sheetMaster, [
     "ID MASTER", "NOMOR AJU", "KD KELOMPOK POS", 
@@ -44,7 +35,6 @@ async function generateCEISAExcel(data, outputPath) {
   ]);
   if (data.master) sheetMaster.addRows(data.master);
 
-  // 3. Detil
   const sheetDetil = workbook.addWorksheet("Detil");
   addColumns(sheetDetil, [
     "ID DETIL", "ID MASTER", "NOMOR AJU", "KD KELOMPOK POS", 
@@ -63,21 +53,18 @@ async function generateCEISAExcel(data, outputPath) {
   ]);
   if (data.detil) sheetDetil.addRows(data.detil);
 
-  // 4. Barang
   const sheetBarang = workbook.addWorksheet("Barang");
   addColumns(sheetBarang, [
     "ID BARANG", "ID DETIL", "SERI BARANG", "HS CODE", "URAIAN BARANG"
   ]);
   if (data.barang) sheetBarang.addRows(data.barang);
 
-  // 5. Dokumen
   const sheetDokumen = workbook.addWorksheet("Dokumen");
   addColumns(sheetDokumen, [
     "ID DOKUMEN", "ID DETIL", "KODE DOKUMEN", "NOMOR DOKUMEN", "TANGGAL DOKUMEN", "KODE KANTOR"
   ]);
   if (data.dokumen) sheetDokumen.addRows(data.dokumen);
 
-  // 6. Kontainer
   const sheetKontainer = workbook.addWorksheet("Kontainer");
   addColumns(sheetKontainer, [
     "ID KONTAINER", "ID DETIL", "SERI KONTAINER", "NOMOR KONTAINER", 
@@ -86,7 +73,6 @@ async function generateCEISAExcel(data, outputPath) {
   ]);
   if (data.kontainer) sheetKontainer.addRows(data.kontainer);
 
-  // 7. Respon Header
   const sheetRespon = workbook.addWorksheet("Respon Header");
   addColumns(sheetRespon, [
     "ID RESPON", "NOMOR AJU", "KODE RESPON", "TANGGAL RESPON", 
