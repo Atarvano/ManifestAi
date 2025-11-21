@@ -123,6 +123,25 @@ uploadForm.addEventListener("submit", async function (e) {
   formData.append("blFormatTengah", blFormatTengah.value || "TWN/BLW");
   formData.append("blTahun", blTahun.value || "2025");
 
+  // Add port information
+  const pelabuhanAsal = document.getElementById("pelabuhanAsal");
+  const pelabuhanTransit = document.getElementById("pelabuhanTransit");
+  const pelabuhanBongkar = document.getElementById("pelabuhanBongkar");
+  const pelabuhanSelanjutnya = document.getElementById("pelabuhanSelanjutnya");
+
+  if (pelabuhanAsal.value.trim()) {
+    formData.append("pelabuhanAsal", pelabuhanAsal.value.trim().toUpperCase());
+  }
+  if (pelabuhanTransit.value.trim()) {
+    formData.append("pelabuhanTransit", pelabuhanTransit.value.trim().toUpperCase());
+  }
+  if (pelabuhanBongkar.value.trim()) {
+    formData.append("pelabuhanBongkar", pelabuhanBongkar.value.trim().toUpperCase());
+  }
+  if (pelabuhanSelanjutnya.value.trim()) {
+    formData.append("pelabuhanSelanjutnya", pelabuhanSelanjutnya.value.trim().toUpperCase());
+  }
+
   // Add custom instructions if provided
   const instructions = customInstructions.value.trim();
   if (instructions) {

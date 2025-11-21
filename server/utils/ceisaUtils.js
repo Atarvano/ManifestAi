@@ -102,14 +102,21 @@ function mapToCEISA(rawData, metadata = {}) {
   const ID_DATA = generateID();
   const KPPBC = metadata.kppbc || "";
 
+  // Calculate Totals
+  const totalPos = rawData.length;
+  const totalKemasan = rawData.reduce((sum, row) => sum + fixNumber(row.quantity), 0);
+  const totalKontainer = rawData.filter(row => row.container_no).length;
+  const totalBruto = rawData.reduce((sum, row) => sum + fixNumber(row.gross_weight), 0);
+  const totalVolume = rawData.reduce((sum, row) => sum + fixNumber(row.volume), 0);
+
   // 1. HEADER
-  // Columns: NOMOR AJU, ID DATA, NPWP, JNS MANIFEST, KD JNS MANIFEST, KPPBC, NO BC 10, TGL BC 10, NO BC 11, TGL BC 11, NAMA SARANA ANGKUT, KODE MODA, CALL SIGN, NO IMO, NO_MMSI, NEGARA
+  // Columns: NOMOR AJU, ID DATA, NPWP, JNS MANIFEST, KD JNS MANIFEST, KPPBC, NO BC 10, TGL BC 10, NO BC 11, TGL BC 11, NAMA SARANA ANGKUT, KODE MODA, CALL SIGN, NO IMO, NO_MMSI, NEGARA, NO VOYAGE / ARRIVAL, DEPARTURE FLIGHT, NAHKODA, HANDLING AGENT, PELABUHAN ASAL, PELABUHAN TRANSIT, PELABUHAN BONGKAR, PELABUHAN SELANJUTNYA, KADE, TGL TIBA, JAM TIBA, TGL KEDATANGAN, JAM KEDATANGAN, TGL BONGKAR, JAM BONGKAR, TGL MUAT, JAM MUAT, TGL KEBERANGKATAN, JAM KEBERANGKATAN, TOTAL POS, TOTAL KEMASAN, TOTAL KONTAINER, TOTAL MASTER BL/AWB, TOTAL BRUTO, TOTAL VOLUME, FLAG NIHIL, STATUS, NO PERBAIKAN, TGL PERBAIKAN, SERI PERBAIKAN, PEMBERITAHU, LENGKAP, USER, ID ASAL DATA, ID MODUL, WAKTU REKAM, WAKTU UPDATE, VERSI MODUL
   result.header.push({
-    "NOMOR AJU": NOMOR_AJU,
+    "NOMOR AJU": "18090503900520251106000560", // Example format
     "ID DATA": ID_DATA,
-    "NPWP": "", // User to fill
-    "JNS MANIFEST": "INWARD", // Default
-    "KD JNS MANIFEST": "1", // 1=Inward
+    "NPWP": "029839123215000",
+    "JNS MANIFEST": "IS",
+    "KD JNS MANIFEST": "RK",
     "KPPBC": KPPBC,
     "NO BC 10": "",
     "TGL BC 10": "",
@@ -120,7 +127,45 @@ function mapToCEISA(rawData, metadata = {}) {
     "CALL SIGN": metadata.callSign || "",
     "NO IMO": metadata.noImo || "",
     "NO_MMSI": "",
-    "NEGARA": ""
+    "NEGARA": "",
+    "NO VOYAGE / ARRIVAL": rawData[0]?.voyage || "",
+    "DEPARTURE FLIGHT": "",
+    "NAHKODA": "",
+    "HANDLING AGENT": "",
+    "PELABUHAN ASAL": rawData[0]?.port_load || metadata.pelabuhanAsal || "",
+    "PELABUHAN TRANSIT": rawData[0]?.port_transit || "",
+    "PELABUHAN BONGKAR": rawData[0]?.port_discharge || metadata.pelabuhanBongkar || "",
+    "PELABUHAN SELANJUTNYA": rawData[0]?.port_final || "",
+    "KADE": "",
+    "TGL TIBA": new Date().toISOString().split('T')[0],
+    "JAM TIBA": "00:00:00",
+    "TGL KEDATANGAN": new Date().toISOString().split('T')[0],
+    "JAM KEDATANGAN": "00:00:00",
+    "TGL BONGKAR": "",
+    "JAM BONGKAR": "",
+    "TGL MUAT": "",
+    "JAM MUAT": "",
+    "TGL KEBERANGKATAN": "",
+    "JAM KEBERANGKATAN": "",
+    "TOTAL POS": totalPos,
+    "TOTAL KEMASAN": totalKemasan,
+    "TOTAL KONTAINER": totalKontainer,
+    "TOTAL MASTER BL/AWB": "1", // Assuming 1 Master BL for now
+    "TOTAL BRUTO": totalBruto,
+    "TOTAL VOLUME": totalVolume,
+    "FLAG NIHIL": "N",
+    "STATUS": "",
+    "NO PERBAIKAN": "",
+    "TGL PERBAIKAN": "",
+    "SERI PERBAIKAN": "",
+    "PEMBERITAHU": "",
+    "LENGKAP": "Y",
+    "USER": "",
+    "ID ASAL DATA": "",
+    "ID MODUL": "",
+    "WAKTU REKAM": "",
+    "WAKTU UPDATE": "",
+    "VERSI MODUL": "2002"
   });
 
   // Process Rows
@@ -134,15 +179,15 @@ function mapToCEISA(rawData, metadata = {}) {
     const ID_MASTER = generateID(); 
 
     // 2. MASTER
-    // Columns: ID MASTER, NOMOR AJU, KD KELOMPOK POS, NO MASTER BL/AWB, TGL MASTER BL/AWB, JML HOST BL/AWB, STATUS DETIL
+    // Columns: ID MASTER, NOMOR AJU, KD KELOMPOK POS, NO MASTER BL/AWB, TGL MASTER BL/AWB, JML HOST BL/AWB, RESPON
     result.master.push({
       "ID MASTER": ID_MASTER,
-      "NOMOR AJU": NOMOR_AJU,
+      "NOMOR AJU": "18090503900520251106000560",
       "KD KELOMPOK POS": "",
       "NO MASTER BL/AWB": mbl,
       "TGL MASTER BL/AWB": "",
       "JML HOST BL/AWB": "1",
-      "STATUS DETIL": "LENGKAP"
+      "RESPON": ""
     });
 
     // 3. DETIL

@@ -17,15 +17,23 @@ async function generateCEISAExcel(data, outputPath) {
   };
 
   // 1. Header
-  // NOMOR AJU, ID DATA, NPWP, JNS MANIFEST, KD JNS MANIFEST, KPPBC, NO BC 10, TGL BC 10, NO BC 11, TGL BC 11, NAMA SARANA ANGKUT, KODE MODA, CALL SIGN, NO IMO, NO_MMSI, NEGARA
   const sheetHeader = workbook.addWorksheet("Header");
   addColumns(sheetHeader, [
     "NOMOR AJU", "ID DATA", "NPWP", "JNS MANIFEST", "KD JNS MANIFEST", 
     "KPPBC", "NO BC 10", "TGL BC 10", "NO BC 11", "TGL BC 11", 
-    "NAMA SARANA ANGKUT", "KODE MODA", "CALL SIGN", "NO IMO", "NO_MMSI", "NEGARA"
+    "NAMA SARANA ANGKUT", "KODE MODA", "CALL SIGN", "NO IMO", "NO_MMSI", "NEGARA",
+    "NO VOYAGE / ARRIVAL", "DEPARTURE FLIGHT", "NAHKODA", "HANDLING AGENT", 
+    "PELABUHAN ASAL", "PELABUHAN TRANSIT", "PELABUHAN BONGKAR", "PELABUHAN SELANJUTNYA", 
+    "KADE", "TGL TIBA", "JAM TIBA", "TGL KEDATANGAN", "JAM KEDATANGAN", 
+    "TGL BONGKAR", "JAM BONGKAR", "TGL MUAT", "JAM MUAT", 
+    "TGL KEBERANGKATAN", "JAM KEBERANGKATAN", 
+    "TOTAL POS", "TOTAL KEMASAN", "TOTAL KONTAINER", "TOTAL MASTER BL/AWB", 
+    "TOTAL BRUTO", "TOTAL VOLUME", "FLAG NIHIL", "STATUS", 
+    "NO PERBAIKAN", "TGL PERBAIKAN", "SERI PERBAIKAN", 
+    "PEMBERITAHU", "LENGKAP", "USER", "ID ASAL DATA", "ID MODUL", 
+    "WAKTU REKAM", "WAKTU UPDATE", "VERSI MODUL"
   ]);
   if (data.header) sheetHeader.addRows(data.header);
-  
 
   // 2. Master
   const sheetMaster = workbook.addWorksheet("Master entry");
@@ -56,7 +64,6 @@ async function generateCEISAExcel(data, outputPath) {
   if (data.detil) sheetDetil.addRows(data.detil);
 
   // 4. Barang
-  // ID_HEADER, NO_POS, NO_SUB_POS, NO_SUB_SUB_POS, SERI_BRG, URAIAN_BRG, JML_KMS, JN_KMS, KODE_HS, FLAG_LARTAS, FLAG_PERIKSA_FISIK, MARK_DESC, KODE_NEGARA_ASAL, BRUTO, KUBIKASI, VOLUME
   const sheetBarang = workbook.addWorksheet("Barang");
   addColumns(sheetBarang, [
     "ID BARANG", "ID DETIL", "SERI BARANG", "HS CODE", "URAIAN BARANG"
@@ -64,7 +71,6 @@ async function generateCEISAExcel(data, outputPath) {
   if (data.barang) sheetBarang.addRows(data.barang);
 
   // 5. Dokumen
-  // ID_HEADER, NO_POS, NO_SUB_POS, NO_SUB_SUB_POS, KODE_DOK, NO_DOK, TGL_DOK
   const sheetDokumen = workbook.addWorksheet("Dokumen");
   addColumns(sheetDokumen, [
     "ID DOKUMEN", "ID DETIL", "KODE DOKUMEN", "NOMOR DOKUMEN", "TANGGAL DOKUMEN", "KODE KANTOR"
@@ -72,7 +78,6 @@ async function generateCEISAExcel(data, outputPath) {
   if (data.dokumen) sheetDokumen.addRows(data.dokumen);
 
   // 6. Kontainer
-  // ID_HEADER, NO_POS, NO_SUB_POS, NO_SUB_SUB_POS, NO_CONT, KODE_UK_CONT, KODE_TIPE_CONT, KODE_ST_CONT, BRUTO, FLAG_PARTIAL
   const sheetKontainer = workbook.addWorksheet("Kontainer");
   addColumns(sheetKontainer, [
     "ID KONTAINER", "ID DETIL", "SERI KONTAINER", "NOMOR KONTAINER", 
@@ -82,7 +87,6 @@ async function generateCEISAExcel(data, outputPath) {
   if (data.kontainer) sheetKontainer.addRows(data.kontainer);
 
   // 7. Respon Header
-  // ID_HEADER, ID_RESPON, KODE_RESPON, NOMOR_RESPON, TANGGAL_RESPON, WAKTU_RESPON, KETERANGAN, FLAG_BACA
   const sheetRespon = workbook.addWorksheet("Respon Header");
   addColumns(sheetRespon, [
     "ID RESPON", "NOMOR AJU", "KODE RESPON", "TANGGAL RESPON", 
