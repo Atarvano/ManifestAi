@@ -204,31 +204,14 @@ async function enrichWithHSCodesSequential(items) {
 }
 
 async function enrichWithHSCodes(items) {
-  const enrichedItems = [];
-
-  console.log(`\n🤖 Processing ${items.length} items with sequential mode...`);
-
-  for (let i = 0; i < items.length; i++) {
-    const item = items[i];
-    try {
-      if (item.description) {
-        const hsCode = await getHSCode(item.description);
-        if (hsCode) {
-          item.hs_code = hsCode;
-          console.log(`✅ Item ${i + 1}/${items.length}: ${hsCode}`);
-        }
-      }
-      enrichedItems.push(item);
-    } catch (error) {
-      console.error(`❌ Item ${i + 1}: ${error.message}`);
-      enrichedItems.push(item);
-    }
+  // Auto-select: Batch for >10 items, Sequential for <=10 items
+  if (items.length > 10) {
+    console.log(`📊 Auto-selecting BATCH mode for ${items.length} items`);
+    return await enrichWithHSCodesBatch(items);
+  } else {
+    console.log(`📊 Auto-selecting SEQUENTIAL mode for ${items.length} items`);
+    return await enrichWithHSCodesSequential(items);
   }
-
-  console.log(
-    `\n✅ Enrichment complete: ${enrichedItems.length} items processed`
-  );
-  return enrichedItems;
 }
 
 async function testGroqConnection() {

@@ -5,8 +5,6 @@ const router = express.Router();
 const prosesController = require("../controllers/prosesController");
 const pdfController = require("../controllers/pdfController");
 const zipController = require("../controllers/zipController");
-const beacukaiController = require("../controllers/beacukaiController");
-const ceisaController = require("../controllers/ceisaController");
 
 // Routes
 // POST /api/proses - Process Excel file with AI normalization
@@ -35,14 +33,5 @@ router.post("/generate-zip", zipController.generateZip);
 
 // POST /api/generate-excel - Generate single Excel file
 router.post("/generate-excel", zipController.generateExcel);
-
-// POST /api/export-beacukai - Export to Beacukai format
-router.post("/export-beacukai", beacukaiController.exportBeacukai);
-
-// POST /api/export-ceisa - Export to CEISA Excel format
-router.post("/export-ceisa", ceisaController.exportCeisa);
-
-// GET /api/ceisa-template - Get CEISA template
-router.get("/ceisa-template", ceisaController.getCeisaTemplate);
 
 module.exports = router;

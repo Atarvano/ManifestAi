@@ -69,7 +69,4 @@ app.listen(PORT, () => {
   console.log("  POST /api/generate-pdf");
   console.log("  POST /api/generate-zip");
   console.log("  POST /api/generate-excel");
-  console.log("  POST /api/export-beacukai");
-  console.log("  POST /api/export-ceisa");
-  console.log("  GET  /api/ceisa-template");
 });
