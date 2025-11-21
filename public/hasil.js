@@ -457,3 +457,89 @@ function formatCurrency(num) {
     maximumFractionDigits: 2,
   }).format(num);
 }
+/**
+ * Open CEISA Modal
+ */
+function openCeisaModal() {
+  document.getElementById("ceisaModal").classList.remove("hidden");
+}
+
+/**
+ * Close CEISA Modal
+ */
+function closeCeisaModal() {
+  document.getElementById("ceisaModal").classList.add("hidden");
+}
+
+/**
+ * Generate CEISA Excel from current data
+ */
+async function generateCeisaFromData() {
+  if (!manifestData || !manifestData.data) {
+    alert("❌ Tidak ada data untuk diproses");
+    return;
+  }
+
+  const btn = event.target;
+  const originalText = btn.innerHTML;
+  btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Generating...';
+  btn.disabled = true;
+
+  try {
+    // Collect Metadata
+    const metadata = {
+      nomorAju: document.getElementById("nomorAju").value,
+      npwp: document.getElementById("npwp").value,
+      kppbc: document.getElementById("kppbc").value,
+      kdGudang: document.getElementById("kdGudang").value,
+      noBc11: document.getElementById("noBc11").value,
+      tglBc11: document.getElementById("tglBc11").value,
+      saranaAngkut: document.getElementById("saranaAngkut").value,
+      callSign: document.getElementById("callSign").value,
+      noImo: document.getElementById("noImo").value,
+      mmsi: document.getElementById("mmsi").value,
+      negara: document.getElementById("negara").value
+    };
+
+    // Send to Backend
+    const response = await fetch("/api/generate-ceisa-json", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        manifestData: manifestData.data, // Send the array of items
+        metadata: metadata
+      }),
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`HTTP ${response.status}: ${errorText.substring(0, 100)}`);
+    }
+
+    const result = await response.json();
+
+    if (result.success) {
+      // Download File
+      const a = document.createElement("a");
+      a.href = result.downloadUrl;
+      a.download = result.downloadUrl.split("/").pop();
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      
+      closeCeisaModal();
+      alert("✅ Berhasil generate Excel CEISA!");
+    } else {
+      alert("❌ Error: " + result.error);
+    }
+
+  } catch (error) {
+    console.error("Error generating CEISA:", error);
+    alert("❌ Gagal: " + error.message);
+  } finally {
+    btn.innerHTML = originalText;
+    btn.disabled = false;
+  }
+}

@@ -81,11 +81,94 @@
             >
               <i class="fas fa-file-archive mr-2"></i>Download ZIP (All PDFs)
             </button>
+            <button
+              onclick="openCeisaModal()"
+              class="bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white font-bold py-3 px-8 rounded-lg transition-colors shadow-lg"
+            >
+              <i class="fas fa-file-contract mr-2"></i>Format CEISA
+            </button>
           </div>
         </div>
       </div>
 
       <!-- Export Modal -->
+      <div id="ceisaModal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
+        <div class="relative top-20 mx-auto p-5 border w-full max-w-4xl shadow-lg rounded-xl bg-white">
+          <div class="flex justify-between items-center mb-4 border-b pb-2">
+            <h3 class="text-2xl font-bold text-gray-900">Data Header Manifest CEISA</h3>
+            <button onclick="closeCeisaModal()" class="text-gray-400 hover:text-gray-600">
+              <i class="fas fa-times text-xl"></i>
+            </button>
+          </div>
+          
+          <form id="ceisaForm" class="space-y-6">
+            <div class="grid md:grid-cols-2 gap-6">
+              <!-- Left Column -->
+              <div class="space-y-4">
+                <div>
+                  <label class="block text-sm font-semibold text-gray-700 mb-1">Nomor Aju</label>
+                  <input type="text" id="nomorAju" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500" placeholder="000000-000000-20250101-000001">
+                </div>
+                <div>
+                  <label class="block text-sm font-semibold text-gray-700 mb-1">NPWP</label>
+                  <input type="text" id="npwp" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500" placeholder="00.000.000.0-000.000">
+                </div>
+                <div>
+                  <label class="block text-sm font-semibold text-gray-700 mb-1">Kantor Pabean (KPPBC)</label>
+                  <input type="text" id="kppbc" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500" placeholder="020400">
+                </div>
+                <div>
+                  <label class="block text-sm font-semibold text-gray-700 mb-1">Kode Gudang</label>
+                  <input type="text" id="kdGudang" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500" placeholder="IDPLM">
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                  <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">No BC 11</label>
+                    <input type="text" id="noBc11" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500" placeholder="000000">
+                  </div>
+                  <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">Tgl BC 11</label>
+                    <input type="date" id="tglBc11" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500">
+                  </div>
+                </div>
+              </div>
+
+              <!-- Right Column -->
+              <div class="space-y-4">
+                <div>
+                  <label class="block text-sm font-semibold text-gray-700 mb-1">Nama Sarana Angkut</label>
+                  <input type="text" id="saranaAngkut" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500" placeholder="KM. CONTOH VESSEL">
+                </div>
+                <div>
+                  <label class="block text-sm font-semibold text-gray-700 mb-1">Call Sign</label>
+                  <input type="text" id="callSign" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500" placeholder="ABCD">
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                  <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">No IMO</label>
+                    <input type="text" id="noImo" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500" placeholder="1234567">
+                  </div>
+                  <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">MMSI</label>
+                    <input type="text" id="mmsi" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500" placeholder="987654321">
+                  </div>
+                </div>
+                <div>
+                  <label class="block text-sm font-semibold text-gray-700 mb-1">Negara Bendera</label>
+                  <input type="text" id="negara" value="ID" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500" placeholder="ID">
+                </div>
+              </div>
+            </div>
+
+            <div class="flex justify-end gap-4 pt-4 border-t">
+              <button type="button" onclick="closeCeisaModal()" class="px-6 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600">Batal</button>
+              <button type="button" onclick="generateCeisaFromData()" class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-bold">
+                <i class="fas fa-file-contract mr-2"></i>Generate Excel
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
 
       <!-- Data Tables (Grouped by B/L) -->
       <div class="max-w-7xl mx-auto" id="dataContainer">
