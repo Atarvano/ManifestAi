@@ -66,14 +66,12 @@ function fixNumber(val) {
  * @param {Array} rawData - Array of objects from Excel/CSV
  * @param {Object} metadata - Additional info (Header info)
  */
-function generateCeisaID() {
-  // Generate a 16-digit numeric string
-  // Example: 1156951922736700
-  let id = "";
-  for (let i = 0; i < 16; i++) {
-    id += Math.floor(Math.random() * 10);
+function generateRandomDigits(length) {
+  let result = "";
+  for (let i = 0; i < length; i++) {
+    result += Math.floor(Math.random() * 10);
   }
-  return id;
+  return result;
 }
 
 /**
@@ -92,9 +90,16 @@ function mapToCEISA(rawData, metadata = {}) {
     respon_header: []
   };
 
+  // Generate Session Prefix (8 digits) for this manifest
+  // Example: 11569519
+  const SESSION_PREFIX = generateRandomDigits(8);
+
+  // Helper to generate full ID
+  const generateID = () => SESSION_PREFIX + generateRandomDigits(8);
+
   // Common Data
   const NOMOR_AJU = "0000" + Date.now(); // Placeholder
-  const ID_DATA = generateCeisaID();
+  const ID_DATA = generateID();
   const KPPBC = metadata.kppbc || "";
 
   // 1. HEADER
@@ -125,8 +130,20 @@ function mapToCEISA(rawData, metadata = {}) {
     const mbl = cleanBLNumber(row.master_bl || row.NO_MASTER_BLAWB || row.MBL || "MBL-DEFAULT");
     const hbl = cleanBLNumber(row.house_bl || row.NO_HOUSE_BLAWB || row.HBL || `HBL-${index + 1}`);
     
-    const ID_DETIL = generateCeisaID();
-    const ID_MASTER = generateCeisaID(); // Assuming this is needed, or maybe it links to something else? Using random for now.
+    const ID_DETIL = generateID();
+    const ID_MASTER = generateID(); 
+
+    // 2. MASTER
+    // Columns: ID MASTER, NOMOR AJU, KD KELOMPOK POS, NO MASTER BL/AWB, TGL MASTER BL/AWB, JML HOST BL/AWB, STATUS DETIL
+    result.master.push({
+      "ID MASTER": ID_MASTER,
+      "NOMOR AJU": NOMOR_AJU,
+      "KD KELOMPOK POS": "",
+      "NO MASTER BL/AWB": mbl,
+      "TGL MASTER BL/AWB": "",
+      "JML HOST BL/AWB": "1",
+      "STATUS DETIL": "LENGKAP"
+    });
 
     // 3. DETIL
     // Columns: ID DETIL, ID MASTER, NOMOR AJU, KD KELOMPOK POS, NO POS, NO SUB POS, NO SUB SUB POS, NO MASTER BLAWB, TGL MASTER BLAWB, NO HOST BLAWB, TGL HOST BLAWB, MOTHER VESSEL, NPWP CONSIGNEE, NAMA CONSIGNEE, ALMT CONSIGNEE, NEG CONSIGNEE, NPWP SHIPPER, NAMA SHIPPER, ALMT SHIPPER, NEG SHIPPER, NAMA NOTIFY, ALMT NOTIFY, NEG NOTIFY, PELABUHAN ASAL, PELABUHAN TRANSIT, PELABUHAN BONGKAR, PELABUHAN AKHIR, JUMLAH KEMASAN, JENIS KEMASAN, MERK KEMASAN, JUMLAH KONTAINER, BRUTO, VOLUME, FL PARTIAL, TOTAL KEMASAN, TOTAL KONTAINER, STATUS DETIL, FL KONSOLIDASI, FL PECAH, FL PERBAIKAN, JENIS ID SHIPPER, JENIS ID CONSIGNEE
@@ -178,7 +195,7 @@ function mapToCEISA(rawData, metadata = {}) {
     // 4. BARANG
     // Columns: ID BARANG, ID DETIL, SERI BARANG, HS CODE, URAIAN BARANG
     result.barang.push({
-      "ID BARANG": generateCeisaID(),
+      "ID BARANG": generateID(),
       "ID DETIL": ID_DETIL,
       "SERI BARANG": "1",
       "HS CODE": normalizeHSCode(row.hs_code),
@@ -188,7 +205,7 @@ function mapToCEISA(rawData, metadata = {}) {
     // 5. DOKUMEN
     // Columns: ID DOKUMEN, ID DETIL, KODE DOKUMEN, NOMOR DOKUMEN, TANGGAL DOKUMEN, KODE KANTOR
     result.dokumen.push({
-      "ID DOKUMEN": generateCeisaID(),
+      "ID DOKUMEN": generateID(),
       "ID DETIL": ID_DETIL,
       "KODE DOKUMEN": "705", // Kode Invoice usually
       "NOMOR DOKUMEN": "INV-" + hbl,
@@ -201,7 +218,7 @@ function mapToCEISA(rawData, metadata = {}) {
     if (row.container_no) {
       const cntrVal = validateContainer(row.container_no);
       result.kontainer.push({
-        "ID KONTAINER": generateCeisaID(),
+        "ID KONTAINER": generateID(),
         "ID DETIL": ID_DETIL,
         "SERI KONTAINER": "1",
         "NOMOR KONTAINER": cntrVal.cleaned,

@@ -25,6 +25,16 @@ async function generateCEISAExcel(data, outputPath) {
     "NAMA SARANA ANGKUT", "KODE MODA", "CALL SIGN", "NO IMO", "NO_MMSI", "NEGARA"
   ]);
   if (data.header) sheetHeader.addRows(data.header);
+  
+
+  // 2. Master
+  const sheetMaster = workbook.addWorksheet("Master entry");
+  addColumns(sheetMaster, [
+    "ID MASTER", "NOMOR AJU", "KD KELOMPOK POS", 
+    "NO MASTER BL/AWB", "TGL MASTER BL/AWB", "JML HOST BL/AWB", 
+    "RESPON"
+  ]);
+  if (data.master) sheetMaster.addRows(data.master);
 
   // 3. Detil
   const sheetDetil = workbook.addWorksheet("Detil");
