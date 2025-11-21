@@ -3,7 +3,7 @@ const ExcelJS = require("exceljs");
 const puppeteer = require("puppeteer");
 const fs = require("fs");
 const path = require("path");
-const { enrichWithHSCodes } = require("../utils/aiClient"); // Universal AI client
+const { enrichWithHSCodes } = require("../utils/aiClient");
 
 /**
  * POST /api/generate-zip - Production ready
