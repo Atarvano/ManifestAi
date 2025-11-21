@@ -3,210 +3,284 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Hasil Proses Manifes - Review Data</title>
+    <title>Hasil Proses - Manifes Project</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
     />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+      body {
+        font-family: 'Inter', sans-serif;
+        background-color: #F5F5F7;
+        color: #1D1D1F;
+        -webkit-font-smoothing: antialiased;
+      }
+      
+      .nav-blur {
+        background: rgba(255, 255, 255, 0.8);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+      }
+
+      .apple-card {
+        background: white;
+        border-radius: 24px;
+        box-shadow: 0 4px 24px rgba(0, 0, 0, 0.04);
+        transition: all 0.3s ease;
+      }
+      .apple-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+      }
+
+      .stat-card {
+        background: white;
+        border-radius: 20px;
+        padding: 24px;
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.03);
+        border: 1px solid rgba(0, 0, 0, 0.02);
+      }
+
+      .apple-btn {
+        border-radius: 9999px;
+        transition: all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1);
+      }
+      .apple-btn:hover {
+        transform: scale(1.02);
+      }
+      .apple-btn:active {
+        transform: scale(0.98);
+      }
+
+      .table-row-hover:hover td {
+        background-color: #F5F5F7;
+      }
+
+      /* Modal Animation */
+      @keyframes modalFadeIn {
+        from { opacity: 0; transform: scale(0.95); }
+        to { opacity: 1; transform: scale(1); }
+      }
+      .modal-content {
+        animation: modalFadeIn 0.3s cubic-bezier(0.25, 0.8, 0.25, 1) forwards;
+      }
+    </style>
   </head>
-  <body class="bg-linear-to-br from-blue-50 to-indigo-100 min-h-screen">
-    <div class="container mx-auto px-4 py-8">
-      <!-- Header -->
-      <div class="text-center mb-8">
-        <h1 class="text-4xl font-bold text-indigo-900 mb-2">
-          <i class="fas fa-check-circle mr-3 text-green-600"></i>Hasil Proses
-          Manifes
-        </h1>
-        <p class="text-gray-600 text-lg">Data telah dinormalisasi dengan AI</p>
-      </div>
-
-      <!-- Summary Card -->
-      <div class="max-w-7xl mx-auto mb-6">
-        <div class="bg-white rounded-2xl shadow-lg p-6">
-          <div class="grid md:grid-cols-4 gap-4">
-            <div class="text-center p-4 bg-blue-50 rounded-lg">
-              <i class="fas fa-file-excel text-3xl text-blue-600 mb-2"></i>
-              <p class="text-sm text-gray-600">Total Items</p>
-              <p class="text-2xl font-bold text-gray-800" id="totalItems">0</p>
-            </div>
-            <div class="text-center p-4 bg-green-50 rounded-lg">
-              <i class="fas fa-file-invoice text-3xl text-green-600 mb-2"></i>
-              <p class="text-sm text-gray-600">Total B/L</p>
-              <p class="text-2xl font-bold text-gray-800" id="totalBL">0</p>
-            </div>
-            <div class="text-center p-4 bg-purple-50 rounded-lg">
-              <i class="fas fa-robot text-3xl text-purple-600 mb-2"></i>
-              <p class="text-sm text-gray-600">Model AI</p>
-              <p class="text-xl font-bold text-gray-800" id="modelUsed">-</p>
-            </div>
-            <div class="text-center p-4 bg-orange-50 rounded-lg">
-              <i class="fas fa-file text-3xl text-orange-600 mb-2"></i>
-              <p class="text-sm text-gray-600">Filename</p>
-              <p class="text-sm font-bold text-gray-800 truncate" id="fileName">
-                -
-              </p>
-            </div>
+  <body class="min-h-screen flex flex-col">
+    
+    <!-- Navbar -->
+    <nav class="nav-blur sticky top-0 z-50">
+      <div class="container mx-auto px-6 h-16 flex justify-between items-center">
+        <div class="flex items-center gap-3">
+          <div class="w-8 h-8 bg-black text-white rounded-lg flex items-center justify-center">
+            <i class="fas fa-cube text-sm"></i>
           </div>
+          <span class="font-semibold text-lg tracking-tight text-gray-900">Manifes Project</span>
+        </div>
+        <a href="https://github.com/atarvano" target="_blank" class="text-sm font-medium text-gray-500 hover:text-black transition-colors flex items-center gap-2 px-4 py-2 rounded-full hover:bg-gray-100">
+          <span>&copy; Atarvano</span>
+          <i class="fab fa-github text-lg"></i>
+        </a>
+      </div>
+    </nav>
+
+    <main class="flex-grow container mx-auto px-4 py-12 max-w-7xl">
+      
+      <!-- Header Section -->
+      <div class="flex flex-col md:flex-row justify-between items-end mb-10 gap-6">
+        <div>
+          <h1 class="text-4xl font-bold text-gray-900 mb-2 tracking-tight">Hasil Analisis</h1>
+          <p class="text-gray-500 text-lg font-light">Data telah dinormalisasi dan siap diekspor.</p>
+        </div>
+        <div class="flex gap-3">
+          <button onclick="window.location.href='index.html'" class="apple-btn bg-gray-100 hover:bg-gray-200 text-gray-900 font-medium py-3 px-6">
+            <i class="fas fa-arrow-left mr-2"></i>Kembali
+          </button>
+          <button onclick="openCeisaModal()" class="apple-btn bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-6 shadow-lg shadow-blue-200">
+            <i class="fas fa-file-contract mr-2"></i>Format CEISA
+          </button>
         </div>
       </div>
 
-      <!-- Action Buttons -->
-      <div class="max-w-7xl mx-auto mb-6">
-        <div class="bg-white rounded-2xl shadow-lg p-6">
-          <div class="flex flex-wrap gap-4 justify-between items-center">
-            <div class="flex flex-wrap gap-3">
-              <button
-                onclick="window.location.href='index.html'"
-                class="bg-gray-600 hover:bg-gray-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors"
-              >
-                <i class="fas fa-arrow-left mr-2"></i>Kembali
-              </button>
-              <button
-                onclick="downloadJSON()"
-                class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors"
-              >
-                <i class="fas fa-download mr-2"></i>Download JSON
-              </button>
-              <button
-                onclick="downloadExcel()"
-                class="bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors"
-              >
-                <i class="fas fa-file-excel mr-2"></i>Download Excel
-              </button>
+      <!-- Stats Grid -->
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-6 mb-12">
+        <div class="stat-card">
+          <div class="flex items-center gap-3 mb-2 text-blue-600">
+            <div class="w-8 h-8 bg-blue-50 rounded-full flex items-center justify-center">
+              <i class="fas fa-cubes text-sm"></i>
             </div>
-            <button
-              onclick="downloadAllZIP()"
-              class="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white font-bold py-3 px-8 rounded-lg transition-colors shadow-lg"
-            >
-              <i class="fas fa-file-archive mr-2"></i>Download ZIP (All PDFs)
-            </button>
-            <button
-              onclick="openCeisaModal()"
-              class="bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white font-bold py-3 px-8 rounded-lg transition-colors shadow-lg"
-            >
-              <i class="fas fa-file-contract mr-2"></i>Format CEISA
-            </button>
+            <span class="text-sm font-semibold uppercase tracking-wider">Total Items</span>
           </div>
+          <p class="text-3xl font-bold text-gray-900" id="totalItems">0</p>
+        </div>
+        
+        <div class="stat-card">
+          <div class="flex items-center gap-3 mb-2 text-green-600">
+            <div class="w-8 h-8 bg-green-50 rounded-full flex items-center justify-center">
+              <i class="fas fa-file-invoice text-sm"></i>
+            </div>
+            <span class="text-sm font-semibold uppercase tracking-wider">Total B/L</span>
+          </div>
+          <p class="text-3xl font-bold text-gray-900" id="totalBL">0</p>
+        </div>
+
+        <div class="stat-card">
+          <div class="flex items-center gap-3 mb-2 text-purple-600">
+            <div class="w-8 h-8 bg-purple-50 rounded-full flex items-center justify-center">
+              <i class="fas fa-robot text-sm"></i>
+            </div>
+            <span class="text-sm font-semibold uppercase tracking-wider">Model AI</span>
+          </div>
+          <p class="text-xl font-bold text-gray-900 truncate" id="modelUsed">-</p>
+        </div>
+
+        <div class="stat-card">
+          <div class="flex items-center gap-3 mb-2 text-orange-600">
+            <div class="w-8 h-8 bg-orange-50 rounded-full flex items-center justify-center">
+              <i class="fas fa-file text-sm"></i>
+            </div>
+            <span class="text-sm font-semibold uppercase tracking-wider">Filename</span>
+          </div>
+          <p class="text-sm font-medium text-gray-900 truncate" id="fileName">-</p>
         </div>
       </div>
 
-      <!-- Export Modal -->
-      <div id="ceisaModal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
-        <div class="relative top-20 mx-auto p-5 border w-full max-w-4xl shadow-lg rounded-xl bg-white">
-          <div class="flex justify-between items-center mb-4 border-b pb-2">
-            <h3 class="text-2xl font-bold text-gray-900">Data Header Manifest CEISA</h3>
-            <button onclick="closeCeisaModal()" class="text-gray-400 hover:text-gray-600">
-              <i class="fas fa-times text-xl"></i>
-            </button>
-          </div>
-          
-          <form id="ceisaForm" class="space-y-6">
-            <div class="grid md:grid-cols-2 gap-6">
-              <!-- Left Column -->
-              <div class="space-y-4">
-                <div>
-                  <label class="block text-sm font-semibold text-gray-700 mb-1">Nomor Aju</label>
-                  <input type="text" id="nomorAju" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500" placeholder="000000-000000-20250101-000001">
-                </div>
-                <div>
-                  <label class="block text-sm font-semibold text-gray-700 mb-1">NPWP</label>
-                  <input type="text" id="npwp" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500" placeholder="00.000.000.0-000.000">
-                </div>
-                <div>
-                  <label class="block text-sm font-semibold text-gray-700 mb-1">Kantor Pabean (KPPBC)</label>
-                  <input type="text" id="kppbc" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500" placeholder="020400">
-                </div>
-                <div>
-                  <label class="block text-sm font-semibold text-gray-700 mb-1">Kode Gudang</label>
-                  <input type="text" id="kdGudang" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500" placeholder="IDPLM">
-                </div>
-                <div class="grid grid-cols-2 gap-4">
-                  <div>
-                    <label class="block text-sm font-semibold text-gray-700 mb-1">No BC 11</label>
-                    <input type="text" id="noBc11" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500" placeholder="000000">
-                  </div>
-                  <div>
-                    <label class="block text-sm font-semibold text-gray-700 mb-1">Tgl BC 11</label>
-                    <input type="date" id="tglBc11" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500">
-                  </div>
-                </div>
-              </div>
-
-              <!-- Right Column -->
-              <div class="space-y-4">
-                <div>
-                  <label class="block text-sm font-semibold text-gray-700 mb-1">Nama Sarana Angkut</label>
-                  <input type="text" id="saranaAngkut" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500" placeholder="KM. CONTOH VESSEL">
-                </div>
-                <div>
-                  <label class="block text-sm font-semibold text-gray-700 mb-1">Call Sign</label>
-                  <input type="text" id="callSign" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500" placeholder="ABCD">
-                </div>
-                <div class="grid grid-cols-2 gap-4">
-                  <div>
-                    <label class="block text-sm font-semibold text-gray-700 mb-1">No IMO</label>
-                    <input type="text" id="noImo" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500" placeholder="1234567">
-                  </div>
-                  <div>
-                    <label class="block text-sm font-semibold text-gray-700 mb-1">MMSI</label>
-                    <input type="text" id="mmsi" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500" placeholder="987654321">
-                  </div>
-                </div>
-                <div>
-                  <label class="block text-sm font-semibold text-gray-700 mb-1">Negara Bendera</label>
-                  <input type="text" id="negara" value="ID" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500" placeholder="ID">
-                </div>
-              </div>
-            </div>
-
-            <div class="flex justify-end gap-4 pt-4 border-t">
-              <button type="button" onclick="closeCeisaModal()" class="px-6 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600">Batal</button>
-              <button type="button" onclick="generateCeisaFromData()" class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-bold">
-                <i class="fas fa-file-contract mr-2"></i>Generate Excel
-              </button>
-            </div>
-          </form>
-        </div>
+      <!-- Action Bar -->
+      <div class="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 mb-8 flex flex-wrap gap-4 justify-center md:justify-start">
+        <button onclick="downloadJSON()" class="apple-btn bg-gray-50 hover:bg-gray-100 text-gray-700 font-medium py-2 px-5 text-sm border border-gray-200">
+          <i class="fas fa-code mr-2"></i>JSON
+        </button>
+        <button onclick="downloadExcel()" class="apple-btn bg-green-50 hover:bg-green-100 text-green-700 font-medium py-2 px-5 text-sm border border-green-200">
+          <i class="fas fa-file-excel mr-2"></i>Laporan Excel
+        </button>
+        <button onclick="downloadAllZIP()" class="apple-btn bg-purple-50 hover:bg-purple-100 text-purple-700 font-medium py-2 px-5 text-sm border border-purple-200 ml-auto">
+          <i class="fas fa-file-archive mr-2"></i>Download ZIP (All PDFs)
+        </button>
       </div>
 
-      <!-- Data Tables (Grouped by B/L) -->
-      <div class="max-w-7xl mx-auto" id="dataContainer">
+      <!-- Data Container -->
+      <div id="dataContainer" class="space-y-8">
         <!-- Loading State -->
-        <div
-          id="loadingState"
-          class="bg-white rounded-2xl shadow-lg p-12 text-center"
-        >
-          <i class="fas fa-spinner fa-spin text-6xl text-indigo-600 mb-4"></i>
-          <p class="text-xl text-gray-600">Memuat data...</p>
+        <div id="loadingState" class="text-center py-20">
+          <div class="w-16 h-16 border-4 border-blue-100 border-t-blue-600 rounded-full animate-spin mx-auto mb-4"></div>
+          <p class="text-gray-500 font-medium">Memuat data...</p>
         </div>
 
         <!-- No Data State -->
-        <div
-          id="noDataState"
-          class="hidden bg-white rounded-2xl shadow-lg p-12 text-center"
-        >
-          <i
-            class="fas fa-exclamation-triangle text-6xl text-yellow-600 mb-4"
-          ></i>
-          <p class="text-xl text-gray-800 mb-2">Tidak ada data</p>
-          <p class="text-gray-600 mb-6">Silakan proses file terlebih dahulu</p>
-          <button
-            onclick="window.location.href='index.html'"
-            class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors"
-          >
-            <i class="fas fa-upload mr-2"></i>Upload File
+        <div id="noDataState" class="hidden text-center py-20 bg-white rounded-3xl border border-dashed border-gray-200">
+          <div class="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-4">
+            <i class="fas fa-inbox text-3xl text-gray-300"></i>
+          </div>
+          <h3 class="text-xl font-bold text-gray-900 mb-2">Tidak ada data</h3>
+          <p class="text-gray-500 mb-6">Silakan upload file terlebih dahulu.</p>
+          <button onclick="window.location.href='index.html'" class="apple-btn bg-blue-600 text-white py-3 px-8 font-medium">
+            Upload File
           </button>
         </div>
+      </div>
 
-        <!-- Data will be inserted here -->
+      <!-- CEISA Modal -->
+      <div id="ceisaModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4">
+        <div class="absolute inset-0 bg-black/30 backdrop-blur-sm" onclick="closeCeisaModal()"></div>
+        <div class="modal-content bg-white rounded-3xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto relative z-10">
+          
+          <div class="sticky top-0 bg-white/90 backdrop-blur-md border-b border-gray-100 px-8 py-6 flex justify-between items-center">
+            <div>
+              <h3 class="text-2xl font-bold text-gray-900">Export CEISA</h3>
+              <p class="text-sm text-gray-500">Lengkapi data header manifest</p>
+            </div>
+            <button onclick="closeCeisaModal()" class="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center text-gray-500 hover:bg-gray-200 transition-colors">
+              <i class="fas fa-times"></i>
+            </button>
+          </div>
+          
+          <div class="p-8">
+            <form id="ceisaForm" class="space-y-8">
+              <div class="grid md:grid-cols-2 gap-8">
+                <!-- Left Column -->
+                <div class="space-y-5">
+                  <h4 class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-4">Data Dokumen</h4>
+                  
+                  <div class="space-y-2">
+                    <label class="text-sm font-medium text-gray-700">Nomor Aju</label>
+                    <input type="text" id="nomorAju" class="apple-input w-full px-4 py-3 rounded-xl text-sm bg-gray-50 border-gray-200" placeholder="000000-000000-20250101-000001">
+                  </div>
+                  <div class="space-y-2">
+                    <label class="text-sm font-medium text-gray-700">NPWP</label>
+                    <input type="text" id="npwp" class="apple-input w-full px-4 py-3 rounded-xl text-sm bg-gray-50 border-gray-200" placeholder="00.000.000.0-000.000">
+                  </div>
+                  <div class="grid grid-cols-2 gap-4">
+                    <div class="space-y-2">
+                      <label class="text-sm font-medium text-gray-700">KPPBC</label>
+                      <input type="text" id="kppbc" class="apple-input w-full px-4 py-3 rounded-xl text-sm bg-gray-50 border-gray-200" placeholder="020400">
+                    </div>
+                    <div class="space-y-2">
+                      <label class="text-sm font-medium text-gray-700">Kode Gudang</label>
+                      <input type="text" id="kdGudang" class="apple-input w-full px-4 py-3 rounded-xl text-sm bg-gray-50 border-gray-200" placeholder="IDPLM">
+                    </div>
+                  </div>
+                  <div class="grid grid-cols-2 gap-4">
+                    <div class="space-y-2">
+                      <label class="text-sm font-medium text-gray-700">No BC 11</label>
+                      <input type="text" id="noBc11" class="apple-input w-full px-4 py-3 rounded-xl text-sm bg-gray-50 border-gray-200" placeholder="000000">
+                    </div>
+                    <div class="space-y-2">
+                      <label class="text-sm font-medium text-gray-700">Tgl BC 11</label>
+                      <input type="date" id="tglBc11" class="apple-input w-full px-4 py-3 rounded-xl text-sm bg-gray-50 border-gray-200">
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Right Column -->
+                <div class="space-y-5">
+                  <h4 class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-4">Data Angkutan</h4>
+                  
+                  <div class="space-y-2">
+                    <label class="text-sm font-medium text-gray-700">Nama Sarana Angkut</label>
+                    <input type="text" id="saranaAngkut" class="apple-input w-full px-4 py-3 rounded-xl text-sm bg-gray-50 border-gray-200" placeholder="KM. CONTOH VESSEL">
+                  </div>
+                  <div class="space-y-2">
+                    <label class="text-sm font-medium text-gray-700">Call Sign</label>
+                    <input type="text" id="callSign" class="apple-input w-full px-4 py-3 rounded-xl text-sm bg-gray-50 border-gray-200" placeholder="ABCD">
+                  </div>
+                  <div class="grid grid-cols-2 gap-4">
+                    <div class="space-y-2">
+                      <label class="text-sm font-medium text-gray-700">No IMO</label>
+                      <input type="text" id="noImo" class="apple-input w-full px-4 py-3 rounded-xl text-sm bg-gray-50 border-gray-200" placeholder="1234567">
+                    </div>
+                    <div class="space-y-2">
+                      <label class="text-sm font-medium text-gray-700">MMSI</label>
+                      <input type="text" id="mmsi" class="apple-input w-full px-4 py-3 rounded-xl text-sm bg-gray-50 border-gray-200" placeholder="987654321">
+                    </div>
+                  </div>
+                  <div class="space-y-2">
+                    <label class="text-sm font-medium text-gray-700">Negara Bendera</label>
+                    <input type="text" id="negara" value="ID" class="apple-input w-full px-4 py-3 rounded-xl text-sm bg-gray-50 border-gray-200" placeholder="ID">
+                  </div>
+                </div>
+              </div>
+            </form>
+          </div>
+
+          <div class="bg-gray-50 px-8 py-6 flex justify-end gap-4 rounded-b-3xl border-t border-gray-100">
+            <button type="button" onclick="closeCeisaModal()" class="apple-btn bg-white border border-gray-200 text-gray-700 font-medium py-3 px-6 hover:bg-gray-50">
+              Batal
+            </button>
+            <button type="button" onclick="generateCeisaFromData()" class="apple-btn bg-blue-600 text-white font-medium py-3 px-8 shadow-lg shadow-blue-200">
+              Generate Excel
+            </button>
+          </div>
+        </div>
       </div>
 
       <!-- Footer -->
-      <div class="text-center mt-12 text-gray-500 text-sm">
-        <p>&copy; 2025 Manifes Project. Powered by AI.</p>
-      </div>
-    </div>
+      <footer class="text-center mt-16 text-gray-400 text-sm font-medium">
+        <p>&copy; 2025 Manifes Project. Designed by Atarvano.</p>
+      </footer>
+    </main>
 
     <script src="hasil.js"></script>
   </body>

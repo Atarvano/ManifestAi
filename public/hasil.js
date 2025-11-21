@@ -112,19 +112,18 @@ function createTableCard(blNumber, items) {
   card.className = "bg-white rounded-2xl shadow-lg mb-6 overflow-hidden";
 
   const header = document.createElement("div");
-  header.className =
-    "bg-gradient-to-r from-indigo-600 to-blue-600 text-white p-6";
+  header.className = "bg-white border-b border-gray-100 p-6";
   header.innerHTML = `
         <div class="flex justify-between items-center">
             <div>
-                <h2 class="text-2xl font-bold mb-1">
-                    <i class="fas fa-file-invoice mr-2"></i>B/L: ${blNumber}
+                <h2 class="text-2xl font-bold mb-1 text-gray-900">
+                    <i class="fas fa-file-invoice mr-2 text-blue-600"></i>B/L: ${blNumber}
                 </h2>
-                <p class="text-indigo-100">${items.length} item(s)</p>
+                <p class="text-gray-500 text-sm">${items.length} item(s)</p>
             </div>
             <div class="flex gap-3">
-                <button onclick="generatePDFForBL('${blNumber}')" class="bg-white bg-opacity-20 hover:bg-opacity-30 text-white font-semibold py-2 px-4 rounded-lg transition-colors">
-                    <i class="fas fa-file-pdf mr-2"></i>Buat PDF
+                <button onclick="generatePDFForBL('${blNumber}')" class="bg-gray-100 hover:bg-gray-200 text-gray-900 font-medium py-2 px-4 rounded-full transition-colors text-sm">
+                    <i class="fas fa-file-pdf mr-2 text-red-500"></i>Buat PDF
                 </button>
             </div>
         </div>
